@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Secrets and credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.env.local
+
+# Local config and logs
+*.local
+*.log
+
+# Node.js runtime artifacts
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage/
+.cache/
+.tmp/
+
+# Build output
+/dist/
+/build/
+/out/
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
