@@ -1,0 +1,138 @@
+{
+  "info": {
+    "_postman_id": "48c4e167-7d2b-4e37-a3b9-dbf03b2de795",
+    "name": "SmartBite API",
+    "description": "SmartBite backend requests. Set adminToken after logging in with an account whose database role is admin.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "userEmail", "value": "" },
+    { "key": "userToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "menuItemId", "value": "" },
+    { "key": "orderId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": { "method": "GET", "url": "{{baseUrl}}/health" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200', () => pm.response.to.have.status(200));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Signup",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Postman Test User\",\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"Password123\",\n  \"phone\": \"08000000000\"\n}" },
+            "url": "{{baseUrl}}/auth/signup"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 201', () => pm.response.to.have.status(201));", "const body = pm.response.json();", "pm.collectionVariables.set('userToken', body.token);", "pm.collectionVariables.set('userEmail', body.user.email);"] } }]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"Password123\"\n}" },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200', () => pm.response.to.have.status(200));", "pm.collectionVariables.set('userToken', pm.response.json().token);"] } }]
+        },
+        {
+          "name": "Profile",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }], "url": "{{baseUrl}}/auth/profile" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "List users (admin)",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/auth/admin/users" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200 for an admin token', () => pm.response.to.have.status(200));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "Menu",
+      "item": [
+        {
+          "name": "List menu (public)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/menu" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Create menu item (admin)",
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Postman Jollof Rice\",\n  \"description\": \"Test menu item\",\n  \"price\": 2500,\n  \"stock\": 10,\n  \"category\": \"Main\"\n}" }, "url": "{{baseUrl}}/menu" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 201 for an admin token', () => pm.response.to.have.status(201));", "pm.collectionVariables.set('menuItemId', pm.response.json().item._id);"] } }]
+        },
+        {
+          "name": "Get menu item (public)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/menu/{{menuItemId}}" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Update menu item (admin)",
+          "request": { "method": "PUT", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"stock\": 12\n}" }, "url": "{{baseUrl}}/menu/{{menuItemId}}" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200 for an admin token', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Delete menu item (admin; run last)",
+          "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/menu/{{menuItemId}}" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200 for an admin token', () => pm.response.to.have.status(200));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create order (private)",
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"items\": [\n    { \"menuItem\": \"{{menuItemId}}\", \"quantity\": 1 }\n  ],\n  \"notes\": \"Postman test order\"\n}" }, "url": "{{baseUrl}}/orders" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 201', () => pm.response.to.have.status(201));", "pm.collectionVariables.set('orderId', pm.response.json().order._id);"] } }]
+        },
+        {
+          "name": "My orders (private)",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }], "url": "{{baseUrl}}/orders/my-orders" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "List orders (admin)",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/orders" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200 for an admin token', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Update order status (admin)",
+          "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"status\": \"confirmed\" }" }, "url": "{{baseUrl}}/orders/{{orderId}}/status" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200 for an admin token', () => pm.response.to.have.status(200));"] } }]
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Dashboard (admin)",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/admin/dashboard" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200 for an admin token', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "List users (admin)",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/admin/users" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200 for an admin token', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "Update user role (admin)",
+          "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{ \"role\": \"user\" }" }, "url": "{{baseUrl}}/admin/users/REPLACE_WITH_USER_ID/role" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('returns 200 for an admin token', () => pm.response.to.have.status(200));"] } }]
+        }
+      ]
+    }
+  ]
+}
