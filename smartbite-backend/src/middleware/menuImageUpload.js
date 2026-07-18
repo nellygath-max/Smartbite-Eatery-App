@@ -1,10 +1,7 @@
 const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
 const multer = require('multer');
-
-const uploadDirectory = path.resolve(__dirname, '..', '..', 'uploads', 'menu');
-fs.mkdirSync(uploadDirectory, { recursive: true });
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const { cloudinary, isCloudinaryConfigured } = require('../config/cloudinary');
 
 const extensionByMimeType = {
   'image/jpeg': '.jpg',
@@ -12,10 +9,13 @@ const extensionByMimeType = {
   'image/webp': '.webp',
 };
 
-const storage = multer.diskStorage({
-  destination: uploadDirectory,
-  filename: (req, file, callback) => {
-    callback(null, `${crypto.randomUUID()}${extensionByMimeType[file.mimetype]}`);
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'smartbite/menu',
+    resource_type: 'image',
+    allowed_formats: ['jpg', 'png', 'webp'],
+    public_id: () => crypto.randomUUID(),
   },
 });
 
@@ -31,6 +31,13 @@ const upload = multer({
 }).single('image');
 
 const handleMenuImageUpload = (required) => (req, res, next) => {
+  if (!isCloudinaryConfigured()) {
+    return res.status(500).json({
+      success: false,
+      message: 'Image uploads are unavailable because Cloudinary is not configured.',
+    });
+  }
+
   upload(req, res, (err) => {
     if (err) {
       const message = err.code === 'LIMIT_FILE_SIZE'
@@ -52,4 +59,4 @@ const handleMenuImageUpload = (required) => (req, res, next) => {
 const uploadMenuImage = handleMenuImageUpload(true);
 const uploadMenuImageOptional = handleMenuImageUpload(false);
 
-module.exports = { uploadDirectory, uploadMenuImage, uploadMenuImageOptional };
+module.exports = { uploadMenuImage, uploadMenuImageOptional };

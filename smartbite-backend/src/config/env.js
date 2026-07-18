@@ -3,6 +3,15 @@ const dotenv = require('dotenv');
 
 dotenv.config({ path: path.resolve(__dirname, '..', '..', '.env') });
 
+// Accept a URI copied from a connection dialog that includes a label or other
+// leading text, while always passing only a valid MongoDB URI to Mongoose.
+const configuredMongoUri = process.env.MONGO_URI || '';
+const mongoUriMatch = configuredMongoUri.match(/mongodb(?:\+srv)?:\/\/\S+/);
+const mongoUri = mongoUriMatch ? mongoUriMatch[0] : configuredMongoUri;
+// Keep the application on one explicit database even when the Atlas URI omits
+// a database path (which otherwise makes MongoDB use its default `test` DB).
+const mongoDbName = process.env.MONGO_DB_NAME || 'SmartbiteEateryApp';
+
 // Authentication must never fall back to a source-controlled or predictable
 // signing key. Refuse to start until each environment supplies its own secret.
 const jwtSecret = process.env.JWT_SECRET;
@@ -37,5 +46,6 @@ module.exports = {
   JWT_ISSUER: process.env.JWT_ISSUER || 'smartbite-api',
   JWT_AUDIENCE: process.env.JWT_AUDIENCE || 'smartbite-api-client',
   JWT_EXPIRES_IN: jwtExpiresIn,
-  MONGO_URI: process.env.MONGO_URI || '',
+  MONGO_URI: mongoUri,
+  MONGO_DB_NAME: mongoDbName,
 };

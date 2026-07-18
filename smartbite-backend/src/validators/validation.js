@@ -1,15 +1,9 @@
 const { validationResult } = require('express-validator');
-const fs = require('fs/promises');
+const { destroyCloudinaryAsset } = require('../config/cloudinary');
 
 const removeRejectedUpload = async (file) => {
-  if (!file || !file.path) return;
-  try {
-    await fs.unlink(file.path);
-  } catch (err) {
-    if (err.code !== 'ENOENT') {
-      console.error('Remove rejected upload error:', err);
-    }
-  }
+  if (!file) return;
+  await destroyCloudinaryAsset(file.filename);
 };
 
 const handleValidationErrors = async (req, res, next) => {

@@ -7,4 +7,13 @@ const updateUserRoleValidation = [
   handleValidationErrors,
 ];
 
-module.exports = { updateUserRoleValidation };
+const createUserValidation = [
+  body('name').trim().notEmpty().withMessage('Name is required.'),
+  body('email').trim().isEmail().withMessage('Provide a valid email address.').normalizeEmail(),
+  body('password').isString().isLength({ min: 8 }).withMessage('Password must be at least 8 characters long.'),
+  body('phone').optional().isString().trim().withMessage('Phone must be a string.'),
+  body('role').optional().isIn(['user', 'admin']).withMessage('Role must be user or admin.'),
+  handleValidationErrors,
+];
+
+module.exports = { updateUserRoleValidation, createUserValidation };

@@ -17,7 +17,7 @@ const signToken = (user) => {
 // POST /api/auth/signup
 exports.signup = async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, phone, role = 'user' } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -34,10 +34,8 @@ exports.signup = async (req, res) => {
       });
     }
 
-    // Password is hashed automatically by the pre('save') hook on the model
-    // Public signup may only create standard users. Admins must be provisioned
-    // through a separately protected administrative process.
-    const user = await User.create({ name, email, password, phone, role: 'user' });
+    // Password is hashed automatically by the pre('save') hook on the model.
+    const user = await User.create({ name, email, password, phone, role });
 
     const token = signToken(user);
 
@@ -64,6 +62,40 @@ exports.signup = async (req, res) => {
       message: 'Server error during signup',
       error: err.message,
     });
+  }
+};
+
+// POST /api/admin/users -- protected by the admin router.
+exports.createUser = async (req, res) => {
+  try {
+    const { name, email, password, phone, role = 'user' } = req.body;
+
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: 'An account with this email already exists',
+      });
+    }
+
+    const user = await User.create({ name, email, password, phone, role });
+    return res.status(201).json({
+      success: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
+    });
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+    console.error('Admin user creation error:', err);
+    return res.status(500).json({ success: false, message: 'Server error creating user.' });
   }
 };
 
