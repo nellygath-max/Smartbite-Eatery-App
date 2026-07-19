@@ -1,14 +1,22 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import MealCard from '../components/MealCard';
 import { getMenuItems } from '../services/menuService';
 import { Message } from './shared';
 import { extract } from './pageHelpers';
 export default function Menu() {
   const [meals, setMeals] = useState([]);
-  const [search, setSearch] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
   const [category, setCategory] = useState('All');
   const [price, setPrice] = useState('');
   const [error, setError] = useState('');
+  const searchQuery = searchParams.get('search') || '';
+  const setSearch = (value) => {
+    const nextParams = new URLSearchParams(searchParams);
+    if (value) nextParams.set('search', value);
+    else nextParams.delete('search');
+    setSearchParams(nextParams, { replace: true });
+  };
   useEffect(() => {
     getMenuItems()
       .then(({ data }) => setMeals(extract(data, 'menuItems')))
@@ -25,7 +33,7 @@ export default function Menu() {
     (m) =>
       `${m.name} ${m.description}`
         .toLowerCase()
-        .includes(search.toLowerCase()) &&
+        .includes(searchQuery.toLowerCase()) &&
       (category === 'All' || categoryOf(m) === category) &&
       (!price || Number(m.price) <= Number(price))
   );
@@ -38,22 +46,22 @@ export default function Menu() {
   );
   return (
     <section className="mx-auto max-w-7xl px-5 py-14">
-      <p className="text-sm font-black uppercase tracking-widest text-orange-600">
+      <p className="text-sm font-black uppercase tracking-widest text-brand-muted">
         Kitchen menu
       </p>
       <h1 className="mt-2 text-5xl font-black">Find your next favourite.</h1>
-      <div className="mt-9 rounded-2xl bg-emerald-50 p-4">
+      <div className="mt-9 rounded-2xl bg-brand-secondary-soft p-4">
         <div className="flex flex-col gap-3 md:flex-row">
           <input
-            value={search}
+            value={searchQuery}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search meals, flavours..."
-            className="flex-1 rounded-xl border-0 bg-white px-4 py-3 outline-none ring-1 ring-emerald-100 focus:ring-2 focus:ring-emerald-600"
+            className="flex-1 rounded-xl border-0 bg-brand-surface px-4 py-3 outline-none ring-1 ring-brand-secondary/15 focus:ring-2 focus:ring-brand-secondary"
           />
           <select
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-            className="rounded-xl bg-white px-4 py-3 font-semibold text-stone-600 outline-none ring-1 ring-emerald-100"
+            className="rounded-xl bg-brand-surface px-4 py-3 font-semibold text-brand-muted outline-none ring-1 ring-brand-secondary/15"
           >
             <option value="">Any price</option>
             <option value="2500">Up to ₦2,500</option>
@@ -66,7 +74,7 @@ export default function Menu() {
             <button
               onClick={() => setCategory(c)}
               key={c}
-              className={`rounded-xl px-4 py-2 text-sm font-bold ${category === c ? 'bg-emerald-700 text-white' : 'bg-white text-stone-600'}`}
+              className={`rounded-xl px-4 py-2 text-sm font-bold ${category === c ? 'bg-brand-secondary text-white' : 'bg-brand-surface text-brand-muted'}`}
             >
               {c}
             </button>
@@ -85,7 +93,7 @@ export default function Menu() {
         </div>
       ))}
       {!error && !filtered.length && (
-        <p className="py-16 text-center text-stone-500">
+        <p className="py-16 text-center text-brand-muted">
           No meals match your search and filters.
         </p>
       )}

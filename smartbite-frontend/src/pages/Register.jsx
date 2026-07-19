@@ -21,7 +21,7 @@ export default function Register({ login = false }) {
     try {
       const { data } = await (login ? signIn(form) : signUp(form));
       authenticate(data);
-      navigate('/');
+      navigate(data?.user?.role === 'admin' ? '/admin' : '/');
     } catch (err) {
       setError(
         getApiErrorMessage(
@@ -33,12 +33,12 @@ export default function Register({ login = false }) {
   };
 
   return (
-    <section className="grid min-h-[calc(100vh-80px)] place-items-center bg-emerald-50 px-5 py-12">
+    <section className="grid min-h-[calc(100vh-80px)] place-items-center bg-brand-secondary-soft px-5 py-12">
       <form
         onSubmit={submit}
-        className="w-full max-w-md rounded-[2rem] bg-white p-8 shadow-xl shadow-emerald-950/10"
+        className="w-full max-w-md rounded-4xl bg-brand-surface p-8 shadow-xl shadow-brand-secondary/10"
       >
-        <p className="text-sm font-black uppercase tracking-widest text-orange-600">
+        <p className="text-sm font-black uppercase tracking-widest text-brand-muted">
           Welcome to SmartBite
         </p>
         <h1 className="mt-2 text-3xl font-black">
@@ -66,14 +66,14 @@ export default function Register({ login = false }) {
             required
           />
         </div>
-        <button className="mt-6 w-full rounded-xl bg-emerald-700 py-3.5 font-black text-white">
+        <button className="mt-6 w-full rounded-xl bg-brand-primary py-3.5 font-black text-white transition hover:bg-brand-primary-dark">
           {login ? 'Sign in' : 'Create account'}
         </button>
         <Message error={error} />
-        <p className="mt-5 text-center text-sm text-stone-500">
+        <p className="mt-5 text-center text-sm text-brand-muted">
           {login ? 'New here?' : 'Already have an account?'}{' '}
           <Link
-            className="font-bold text-emerald-700"
+            className="font-bold text-brand-link hover:underline"
             to={login ? '/register' : '/login'}
           >
             {login ? 'Create an account' : 'Sign in'}

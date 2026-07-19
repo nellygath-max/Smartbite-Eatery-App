@@ -23,7 +23,6 @@ const handleCategoryError = (err, res, action) => {
 exports.getMenuCategories = async (req, res) => {
   try {
     const categories = await MenuCategory.find({ active: true })
-      .select('-imageUrl')
       .sort({ name: 1 });
     return res.status(200).json({ success: true, categories });
   } catch (err) {
@@ -33,7 +32,7 @@ exports.getMenuCategories = async (req, res) => {
 
 exports.getMenuCategory = async (req, res) => {
   try {
-    const category = await MenuCategory.findById(req.params.id).select('-imageUrl');
+    const category = await MenuCategory.findById(req.params.id);
     if (!category || !category.active) {
       return res.status(404).json({ success: false, message: 'Menu category not found.' });
     }

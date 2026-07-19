@@ -9,12 +9,12 @@ export default function Cart() {
       <section className="mx-auto max-w-xl px-5 py-24 text-center">
         <p className="text-6xl">🛒</p>
         <h1 className="mt-5 text-3xl font-black">Your cart is waiting.</h1>
-        <p className="mt-2 text-stone-500">
+        <p className="mt-2 text-brand-muted">
           Add something wonderful from the kitchen.
         </p>
         <Link
           to="/menu"
-          className="mt-6 inline-block rounded-xl bg-emerald-700 px-5 py-3 font-bold text-white"
+          className="mt-6 inline-block rounded-xl bg-brand-primary px-5 py-3 font-bold text-white transition hover:bg-brand-primary-dark"
         >
           Browse menu
         </Link>
@@ -27,34 +27,34 @@ export default function Cart() {
         <div className="space-y-4">
           {items.map((item) => (
             <div
-              className="flex gap-4 rounded-2xl bg-white p-4 shadow-sm"
+              className="flex gap-4 rounded-2xl bg-brand-surface p-4 shadow-sm"
               key={item._id}
             >
               <img
-                className="h-20 w-20 rounded-xl object-cover"
+                className="h-20 w-20 rounded-xl bg-brand-secondary-soft object-contain p-1"
                 src={imageFor(item)}
                 alt=""
               />
               <div className="flex-1">
                 <h2 className="font-black">{item.name}</h2>
-                <p className="text-emerald-700">{money(item.price)}</p>
+                <p className="text-brand-secondary">{money(item.price)}</p>
                 <div className="mt-2 flex items-center gap-3">
                   <button
                     onClick={() => updateQuantity(item._id, item.quantity - 1)}
-                    className="grid h-7 w-7 place-items-center rounded-lg bg-stone-100"
+                    className="grid h-7 w-7 place-items-center rounded-lg bg-brand-primary-soft"
                   >
                     −
                   </button>
                   <b>{item.quantity}</b>
                   <button
                     onClick={() => updateQuantity(item._id, item.quantity + 1)}
-                    className="grid h-7 w-7 place-items-center rounded-lg bg-stone-100"
+                    className="grid h-7 w-7 place-items-center rounded-lg bg-brand-primary-soft"
                   >
                     +
                   </button>
                   <button
                     onClick={() => removeItem(item._id)}
-                    className="ml-auto text-sm font-bold text-red-500"
+                    className="ml-auto text-sm font-bold text-brand-status-danger"
                   >
                     Remove
                   </button>
@@ -63,12 +63,12 @@ export default function Cart() {
             </div>
           ))}
         </div>
-        <aside className="h-fit rounded-2xl bg-stone-950 p-6 text-white">
-          <p className="text-stone-400">Order total</p>
+        <aside className="h-fit rounded-2xl bg-brand-secondary-dark p-6 text-white">
+          <p className="text-brand-secondary-soft">Order total</p>
           <p className="mt-2 text-3xl font-black">{money(total)}</p>
           <Link
             to="/checkout"
-            className="mt-6 block rounded-xl bg-orange-500 py-3 text-center font-black"
+            className="mt-6 block rounded-xl bg-brand-primary py-3 text-center font-black transition hover:bg-brand-primary-dark"
           >
             Proceed to checkout
           </Link>

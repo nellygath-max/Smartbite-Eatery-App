@@ -18,14 +18,14 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-5 py-20">
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-sm font-black uppercase tracking-[.18em] text-orange-600">
+            <p className="text-sm font-black uppercase tracking-[.18em] text-brand-muted">
               The favourites
             </p>
             <h2 className="mt-2 text-4xl font-black tracking-tight">
               Made with heart.
             </h2>
           </div>
-          <Link className="font-bold text-emerald-700" to="/menu">
+          <Link className="font-bold text-brand-link hover:underline" to="/menu">
             See all meals →
           </Link>
         </div>
@@ -34,10 +34,10 @@ export default function Home() {
             ? meals.map((meal) => <MealCard key={meal._id} meal={meal} />)
             : ['Smoky Jollof', 'SmartBite Burger', 'Garden Fresh Bowl'].map(
                 (name, i) => (
-                  <div key={name} className="rounded-3xl bg-emerald-50 p-7">
+                  <div key={name} className="rounded-3xl bg-brand-secondary-soft p-7">
                     <p className="text-5xl">{['🍛', '🍔', '🥗'][i]}</p>
                     <h3 className="mt-5 text-xl font-black">{name}</h3>
-                    <p className="mt-2 text-stone-500">
+                    <p className="mt-2 text-brand-muted">
                       Kitchen favourites are loading for you.
                     </p>
                   </div>
@@ -45,15 +45,15 @@ export default function Home() {
               )}
         </div>
       </section>
-      <section className="bg-orange-50">
+      <section className="bg-brand-primary-soft">
         <div className="mx-auto max-w-7xl px-5 py-16 text-center">
-          <p className="text-sm font-black uppercase tracking-widest text-orange-600">
+          <p className="text-sm font-black uppercase tracking-widest text-brand-muted">
             Your table is ready
           </p>
           <h2 className="mt-3 text-4xl font-black">Hungry? Let’s fix that.</h2>
           <Link
             to="/menu"
-            className="mt-7 inline-block rounded-2xl bg-stone-950 px-6 py-3.5 font-bold text-white"
+            className="mt-7 inline-block rounded-2xl bg-brand-primary px-6 py-3.5 font-bold text-white transition hover:bg-brand-primary-dark"
           >
             Order something delicious
           </Link>

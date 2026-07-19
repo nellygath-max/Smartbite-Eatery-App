@@ -17,7 +17,7 @@ const signToken = (user) => {
 // POST /api/auth/signup
 exports.signup = async (req, res) => {
   try {
-    const { name, email, password, phone, role = 'user' } = req.body;
+    const { name, email, password, phone } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -35,7 +35,7 @@ exports.signup = async (req, res) => {
     }
 
     // Password is hashed automatically by the pre('save') hook on the model.
-    const user = await User.create({ name, email, password, phone, role });
+    const user = await User.create({ name, email, password, phone, role: 'user' });
 
     const token = signToken(user);
 

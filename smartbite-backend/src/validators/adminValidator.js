@@ -3,7 +3,7 @@ const { handleValidationErrors } = require('./validation');
 
 const updateUserRoleValidation = [
   param('id').isMongoId().withMessage('Provide a valid user id.'),
-  body('role').isIn(['user', 'admin']).withMessage('Role must be user or admin.'),
+  body('role').isIn(['user', 'admin', 'delivery_staff']).withMessage('Role must be user, admin, or delivery_staff.'),
   handleValidationErrors,
 ];
 
@@ -12,7 +12,7 @@ const createUserValidation = [
   body('email').trim().isEmail().withMessage('Provide a valid email address.').normalizeEmail(),
   body('password').isString().isLength({ min: 8 }).withMessage('Password must be at least 8 characters long.'),
   body('phone').optional().isString().trim().withMessage('Phone must be a string.'),
-  body('role').optional().isIn(['user', 'admin']).withMessage('Role must be user or admin.'),
+  body('role').optional().isIn(['user', 'admin', 'delivery_staff']).withMessage('Role must be user, admin, or delivery_staff.'),
   handleValidationErrors,
 ];
 

@@ -23,13 +23,13 @@ export default function Profile() {
   };
   return (
     <section className="mx-auto max-w-xl px-5 py-14">
-      <p className="font-bold uppercase tracking-widest text-orange-600">
+      <p className="font-bold uppercase tracking-widest text-brand-muted">
         Your account
       </p>
       <h1 className="mt-2 text-4xl font-black">Profile details</h1>
       <form
         onSubmit={submit}
-        className="mt-8 rounded-3xl bg-white p-7 shadow-sm"
+        className="mt-8 rounded-3xl bg-brand-surface p-7 shadow-sm"
       >
         <Field label="Full name" name="name" defaultValue={user?.name} />
         <div className="mt-4">
@@ -43,7 +43,7 @@ export default function Profile() {
         <div className="mt-4">
           <Field label="Phone number" name="phone" defaultValue={user?.phone} />
         </div>
-        <button className="mt-6 rounded-xl bg-emerald-700 px-5 py-3 font-bold text-white">
+        <button className="mt-6 rounded-xl bg-brand-primary px-5 py-3 font-bold text-white transition hover:bg-brand-primary-dark">
           Save changes
         </button>
         <Message error={error} />

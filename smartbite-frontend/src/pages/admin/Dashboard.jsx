@@ -22,9 +22,9 @@ export default function Dashboard() {
           ],
           ['Customers', stats.users ?? stats.totalUsers],
         ].map(([name, value]) => (
-          <div key={name} className="rounded-2xl bg-white p-6 shadow-sm">
-            <p className="text-sm text-stone-500">{name}</p>
-            <p className="mt-2 text-3xl font-black text-emerald-800">
+          <div key={name} className="rounded-2xl bg-brand-surface p-6 shadow-sm">
+            <p className="text-sm text-brand-muted">{name}</p>
+            <p className="mt-2 text-3xl font-black text-brand-secondary-dark">
               {value ?? '—'}
             </p>
           </div>

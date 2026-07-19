@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="mt-auto bg-stone-950 text-stone-300">
+    <footer className="mt-auto bg-brand-text text-brand-primary-soft">
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 md:grid-cols-3">
         <div>
           <p className="text-2xl font-black text-white">
-            Smart<span className="text-orange-400">Bite</span>
+            Smart<span className="text-brand-primary">Bite</span>
           </p>
           <p className="mt-3 max-w-xs text-sm leading-6">
             Comforting favourites and thoughtful delivery, made for your
@@ -30,7 +30,7 @@ export default function Footer() {
           </p>
         </div>
       </div>
-      <div className="border-t border-stone-800 py-4 text-center text-xs">
+      <div className="border-t border-white/15 py-4 text-center text-xs">
         © {new Date().getFullYear()} SmartBite Eatery. Made with care.
       </div>
     </footer>

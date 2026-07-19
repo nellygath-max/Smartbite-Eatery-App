@@ -15,6 +15,15 @@ const storage = new CloudinaryStorage({
     folder: 'smartbite/menu',
     resource_type: 'image',
     allowed_formats: ['jpg', 'png', 'webp'],
+    transformation: [
+      {
+        width: 1400,
+        height: 1400,
+        crop: 'limit',
+        fetch_format: 'auto',
+        quality: 'auto',
+      },
+    ],
     public_id: () => crypto.randomUUID(),
   },
 });

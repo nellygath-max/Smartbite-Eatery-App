@@ -8,33 +8,33 @@ export default function About() {
           alt="Warm restaurant interior"
         />
         <div>
-          <p className="text-sm font-black uppercase tracking-widest text-orange-600">
+          <p className="text-sm font-black uppercase tracking-widest text-brand-muted">
             Our story
           </p>
           <h1 className="mt-3 text-5xl font-black leading-tight">
             Food should feel like a warm welcome.
           </h1>
-          <p className="mt-6 leading-8 text-stone-600">
+          <p className="mt-6 leading-8 text-brand-muted">
             SmartBite began with a simple belief: convenient food can still be
             full of care. We pair familiar flavours with fresh ingredients, so
             every plate feels made just for you.
           </p>
-          <p className="mt-4 leading-8 text-stone-600">
+          <p className="mt-4 leading-8 text-brand-muted">
             From our kitchen in Lagos to your table, we cook with curiosity,
             generosity, and a little bit of joy.
           </p>
           <div className="mt-8 grid grid-cols-3 gap-4 text-center">
             <div>
-              <b className="block text-2xl text-emerald-700">20+</b>
-              <span className="text-xs text-stone-500">Meals</span>
+              <b className="block text-2xl text-brand-secondary">20+</b>
+              <span className="text-xs text-brand-muted">Meals</span>
             </div>
             <div>
-              <b className="block text-2xl text-emerald-700">4.9★</b>
-              <span className="text-xs text-stone-500">Rating</span>
+              <b className="block text-2xl text-brand-secondary">4.9★</b>
+              <span className="text-xs text-brand-muted">Rating</span>
             </div>
             <div>
-              <b className="block text-2xl text-emerald-700">Daily</b>
-              <span className="text-xs text-stone-500">Freshness</span>
+              <b className="block text-2xl text-brand-secondary">Daily</b>
+              <span className="text-xs text-brand-muted">Freshness</span>
             </div>
           </div>
         </div>

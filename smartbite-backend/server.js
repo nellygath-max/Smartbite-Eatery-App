@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const routes = require('./src/routes');
 const { PORT } = require('./src/config/env');
 const { mongoUri, mongoOptions } = require('./src/config/database');
@@ -7,10 +8,12 @@ const path = require('path');
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api', routes);
 
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
 app.get('/', (req, res) => res.send('SmartBite Backend Running'));
 
 mongoose

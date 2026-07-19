@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['user', 'admin'],
+        enum: ['user', 'admin', 'delivery_staff'],
       default: 'user',
     },
     // Increment to invalidate every outstanding access token for this user.
