@@ -13,7 +13,7 @@ const uploadedImage = (file) => (file ? { url: file.path, publicId: file.filenam
 exports.getMenuItems = async (req, res) => {
   try {
     const items = await Menu.find().populate('category').sort({ name: 1 });
-    return res.status(200).json({ success: true, items });
+    return res.status(200).json({ success: true, items, menuItems: items });
   } catch (err) {
     console.error('Get menu error:', err);
     return res.status(500).json({ success: false, message: 'Server error retrieving menu items.' });

@@ -10,9 +10,35 @@ const orderPopulate = [
   },
 ];
 
+const normalizePaymentMethod = (paymentMethod) => (
+  paymentMethod === 'cash_on_delivery' ? 'payment_on_delivery' : paymentMethod
+);
+
+const normalizeOrderPaymentMethod = (order) => {
+  if (!order) {
+    return order;
+  }
+
+  const normalizedPaymentMethod = normalizePaymentMethod(order.paymentMethod);
+  if (typeof order.toObject === 'function') {
+    return {
+      ...order.toObject(),
+      paymentMethod: normalizedPaymentMethod,
+    };
+  }
+
+  return {
+    ...order,
+    paymentMethod: normalizedPaymentMethod,
+  };
+};
+
+const deliveryStaffStatuses = new Set(['ready', 'out_for_delivery', 'delivered']);
+
 exports.createOrder = async (req, res) => {
   try {
     const { items, notes, deliveryAddress, paymentMethod } = req.body;
+    const normalizedPaymentMethod = normalizePaymentMethod(paymentMethod);
 
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({
@@ -146,12 +172,12 @@ exports.createOrder = async (req, res) => {
       items: orderItems,
       totalAmount,
       deliveryAddress,
-      paymentMethod,
+      paymentMethod: normalizedPaymentMethod,
       notes,
     });
     await order.populate(orderPopulate);
 
-    return res.status(201).json({ success: true, order });
+    return res.status(201).json({ success: true, order: normalizeOrderPaymentMethod(order) });
   } catch (err) {
     if (err.name === 'CastError') {
       return res.status(400).json({ success: false, message: 'One or more menu item ids are invalid.' });
@@ -173,7 +199,7 @@ exports.getMyOrders = async (req, res) => {
         populate: { path: 'category', select: 'name description' },
       })
       .sort({ createdAt: -1 });
-    return res.status(200).json({ success: true, orders });
+    return res.status(200).json({ success: true, orders: orders.map(normalizeOrderPaymentMethod) });
   } catch (err) {
     console.error('Get my orders error:', err);
     return res.status(500).json({ success: false, message: 'Server error retrieving orders.' });
@@ -185,7 +211,7 @@ exports.getAllOrders = async (req, res) => {
     const orders = await Order.find()
       .populate(orderPopulate)
       .sort({ createdAt: -1 });
-    return res.status(200).json({ success: true, orders });
+    return res.status(200).json({ success: true, orders: orders.map(normalizeOrderPaymentMethod) });
   } catch (err) {
     console.error('Get orders error:', err);
     return res.status(500).json({ success: false, message: 'Server error retrieving orders.' });
@@ -194,19 +220,34 @@ exports.getAllOrders = async (req, res) => {
 
 exports.updateOrderStatus = async (req, res) => {
   try {
-    if (!req.body.status) {
+    const { status } = req.body;
+
+    if (!status) {
       return res.status(400).json({ success: false, message: 'Order status is required.' });
+    }
+
+    if (req.user.role === 'delivery_staff' && !deliveryStaffStatuses.has(status)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Delivery staff can only update ready, out_for_delivery, or delivered statuses.',
+      });
+    }
+
+    const update = { status };
+
+    if (req.user.role === 'delivery_staff' && status === 'delivered') {
+      update.paymentStatus = 'paid';
     }
 
     const order = await Order.findByIdAndUpdate(
       req.params.id,
-      { status: req.body.status },
+      update,
       { new: true, runValidators: true }
     ).populate(orderPopulate);
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found.' });
     }
-    return res.status(200).json({ success: true, order });
+    return res.status(200).json({ success: true, order: normalizeOrderPaymentMethod(order) });
   } catch (err) {
     if (err.name === 'CastError') {
       return res.status(400).json({ success: false, message: 'Invalid order id.' });
@@ -216,6 +257,37 @@ exports.updateOrderStatus = async (req, res) => {
     }
     console.error('Update order status error:', err);
     return res.status(500).json({ success: false, message: 'Server error updating order status.' });
+  }
+};
+
+exports.updatePaymentStatus = async (req, res) => {
+  try {
+    const { paymentStatus } = req.body;
+
+    if (!paymentStatus) {
+      return res.status(400).json({ success: false, message: 'Payment status is required.' });
+    }
+
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { paymentStatus },
+      { new: true, runValidators: true }
+    ).populate(orderPopulate);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found.' });
+    }
+
+    return res.status(200).json({ success: true, order: normalizeOrderPaymentMethod(order) });
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return res.status(400).json({ success: false, message: 'Invalid order id.' });
+    }
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+    console.error('Update payment status error:', err);
+    return res.status(500).json({ success: false, message: 'Server error updating payment status.' });
   }
 };
 

@@ -14,8 +14,8 @@ const createOrderValidation = [
     .withMessage('Delivery address cannot exceed 300 characters.'),
   body('paymentMethod')
     .optional()
-    .isIn(['cash_on_delivery'])
-    .withMessage('Payment method must be cash_on_delivery.'),
+    .isIn(['payment_on_delivery'])
+    .withMessage('Payment method must be payment_on_delivery.'),
   body('notes').optional().isString().trim().isLength({ max: 500 }).withMessage('Order notes cannot exceed 500 characters.'),
   handleValidationErrors,
 ];
@@ -27,4 +27,15 @@ const updateOrderStatusValidation = [
   handleValidationErrors,
 ];
 
-module.exports = { createOrderValidation, updateOrderStatusValidation };
+const updatePaymentStatusValidation = [
+  body('paymentStatus')
+    .isIn(['unpaid', 'paid'])
+    .withMessage('Provide a valid payment status.'),
+  handleValidationErrors,
+];
+
+module.exports = {
+  createOrderValidation,
+  updateOrderStatusValidation,
+  updatePaymentStatusValidation,
+};

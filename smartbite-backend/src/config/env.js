@@ -41,6 +41,7 @@ const jwtExpiresIn = `${expiryMatch[1]}${expiryMatch[2].toLowerCase()}`;
 
 module.exports = {
   PORT: process.env.PORT || 3000,
+  HOST: process.env.HOST || '0.0.0.0',
   NODE_ENV: process.env.NODE_ENV || 'development',
   JWT_SECRET: jwtSecret,
   JWT_ISSUER: process.env.JWT_ISSUER || 'smartbite-api',
