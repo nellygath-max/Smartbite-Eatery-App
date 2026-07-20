@@ -164,7 +164,7 @@ export default function UsersManagement() {
                   <select
                     value={user.role}
                     onChange={(event) => changeRole(user._id, event.target.value)}
-                    className="rounded-xl border border-brand-border bg-brand-surface p-2 font-bold capitalize outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15"
+                    className="w-full min-w-36 cursor-pointer rounded-xl border border-brand-border bg-brand-surface p-2 font-bold capitalize outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15"
                   >
                     <option value="user">User</option>
                     <option value="admin">Admin</option>

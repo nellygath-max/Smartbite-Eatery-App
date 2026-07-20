@@ -36,7 +36,7 @@ export default function Register({ login = false }) {
     <section className="grid min-h-[calc(100vh-80px)] place-items-center bg-brand-secondary-soft px-5 py-12">
       <form
         onSubmit={submit}
-        className="w-full max-w-md rounded-4xl bg-brand-surface p-8 shadow-xl shadow-brand-secondary/10"
+        className="w-full max-w-md rounded-4xl border border-brand-border bg-brand-surface p-8 shadow-xl shadow-brand-secondary/10"
       >
         <p className="text-sm font-black uppercase tracking-widest text-brand-muted">
           Welcome to SmartBite

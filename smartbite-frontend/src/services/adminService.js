@@ -8,3 +8,5 @@ export const updateUserRole = (id, role) =>
 export const getAllOrders = () => api.get('/admin/orders');
 export const updateOrderStatus = (id, status) =>
   api.patch(`/admin/orders/${id}/status`, { status });
+export const updatePaymentStatus = (id, paymentStatus) =>
+  api.patch(`/admin/orders/${id}/payment-status`, { paymentStatus });

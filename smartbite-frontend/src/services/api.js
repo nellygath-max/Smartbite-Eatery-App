@@ -1,8 +1,21 @@
 import axios from 'axios';
 import { getRawValue, removeStoredValue } from '../utils/storage';
 
+const resolveDefaultApiBaseUrl = () => {
+  if (typeof window === 'undefined') return 'http://localhost:5000/api';
+
+  const { hostname } = window.location;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:5000/api';
+  }
+
+  // When frontend is opened from another device on the same network,
+  // call the backend on the same host with backend default port.
+  return `http://${hostname}:5000/api`;
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || resolveDefaultApiBaseUrl(),
 });
 
 api.interceptors.request.use((config) => {

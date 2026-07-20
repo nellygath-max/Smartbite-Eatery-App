@@ -45,23 +45,21 @@ export default function Menu() {
     {}
   );
   return (
-    <section className="mx-auto max-w-7xl px-5 py-14">
-      <p className="text-sm font-black uppercase tracking-widest text-brand-muted">
-        Kitchen menu
-      </p>
-      <h1 className="mt-2 text-5xl font-black">Find your next favourite.</h1>
-      <div className="mt-9 rounded-2xl bg-brand-secondary-soft p-4">
+    <section className="page-shell py-14">
+      <p className="section-kicker">Kitchen menu</p>
+      <h1 className="section-title">Find your next favourite.</h1>
+      <div className="mt-9 content-card p-4 md:p-5">
         <div className="flex flex-col gap-3 md:flex-row">
           <input
             value={searchQuery}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search meals, flavours..."
-            className="flex-1 rounded-xl border-0 bg-brand-surface px-4 py-3 outline-none ring-1 ring-brand-secondary/15 focus:ring-2 focus:ring-brand-secondary"
+            className="flex-1 rounded-xl border border-brand-border bg-brand-surface px-4 py-3 outline-none transition focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15"
           />
           <select
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-            className="rounded-xl bg-brand-surface px-4 py-3 font-semibold text-brand-muted outline-none ring-1 ring-brand-secondary/15"
+            className="cursor-pointer rounded-xl border border-brand-border bg-brand-surface px-4 py-3 font-semibold text-brand-muted outline-none transition focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15"
           >
             <option value="">Any price</option>
             <option value="2500">Up to ₦2,500</option>
@@ -74,7 +72,7 @@ export default function Menu() {
             <button
               onClick={() => setCategory(c)}
               key={c}
-              className={`rounded-xl px-4 py-2 text-sm font-bold ${category === c ? 'bg-brand-secondary text-white' : 'bg-brand-surface text-brand-muted'}`}
+              className={`rounded-xl px-4 py-2 text-sm font-bold transition ${category === c ? 'bg-brand-secondary text-white' : 'bg-brand-surface text-brand-muted hover:bg-brand-secondary-soft hover:text-brand-text'}`}
             >
               {c}
             </button>

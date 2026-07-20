@@ -1,5 +1,5 @@
-import OrderManagement from '../pages/admin/OrderManagement';
+import DeliveryOrders from '../pages/delivery/DeliveryOrders';
 
 export const deliveryRoutes = [
-  { path: '/delivery/orders', element: <OrderManagement /> },
+  { path: '/delivery/orders', element: <DeliveryOrders /> },
 ];

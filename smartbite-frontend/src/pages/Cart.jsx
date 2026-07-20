@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { imageFor, money } from '../utils/format';
+import { toneSoft } from '../utils/statusStyles';
 
 export default function Cart() {
   const { items, updateQuantity, removeItem, total } = useCart();
@@ -27,7 +28,7 @@ export default function Cart() {
         <div className="space-y-4">
           {items.map((item) => (
             <div
-              className="flex gap-4 rounded-2xl bg-brand-surface p-4 shadow-sm"
+              className="flex flex-col gap-4 rounded-2xl bg-brand-surface p-4 shadow-sm sm:flex-row"
               key={item._id}
             >
               <img
@@ -38,7 +39,7 @@ export default function Cart() {
               <div className="flex-1">
                 <h2 className="font-black">{item.name}</h2>
                 <p className="text-brand-secondary">{money(item.price)}</p>
-                <div className="mt-2 flex items-center gap-3">
+                <div className="mt-2 flex flex-wrap items-center gap-3">
                   <button
                     onClick={() => updateQuantity(item._id, item.quantity - 1)}
                     className="grid h-7 w-7 place-items-center rounded-lg bg-brand-primary-soft"
@@ -54,7 +55,7 @@ export default function Cart() {
                   </button>
                   <button
                     onClick={() => removeItem(item._id)}
-                    className="ml-auto text-sm font-bold text-brand-status-danger"
+                    className={`alert alert-danger text-sm font-bold sm:ml-auto ${toneSoft('danger')}`}
                   >
                     Remove
                   </button>

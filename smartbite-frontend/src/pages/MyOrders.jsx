@@ -9,6 +9,16 @@ import {
   orderStatusStages,
 } from '../utils/orderStatus';
 import { extract } from './pageHelpers';
+
+const paymentMethodLabel = (method) => {
+  if (method === 'payment_on_delivery' || method === 'cash_on_delivery') {
+    return 'Payment on delivery';
+  }
+  return method?.replaceAll('_', ' ') || 'Payment on delivery';
+};
+
+const paymentStatusLabel = (status) => (status === 'paid' ? 'Paid' : 'Unpaid');
+
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
   const loadOrders = () =>
@@ -153,7 +163,10 @@ export default function MyOrders() {
                   Delivery address: {order.deliveryAddress}
                 </p>
                 <p className="mt-1 text-sm text-brand-muted">
-                  Payment: {order.paymentMethod?.replaceAll('_', ' ') || 'cash on delivery'}
+                  Payment method: {paymentMethodLabel(order.paymentMethod)}
+                </p>
+                <p className="mt-1 text-sm text-brand-muted">
+                  Payment status: {paymentStatusLabel(order.paymentStatus)}
                 </p>
               </div>
               <div className="rounded-2xl bg-brand-secondary-soft p-4 text-sm text-brand-text">

@@ -1,8 +1,15 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { imageFor, money } from '../utils/format';
 export default function MealCard({ meal }) {
   const { addItem } = useCart();
+  const navigate = useNavigate();
+
+  const addAndCheckout = () => {
+    addItem(meal);
+    navigate('/checkout');
+  };
+
   return (
     <article className="group overflow-hidden rounded-[1.6rem] border border-brand-border/60 bg-brand-surface shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-secondary/10">
       <Link to={`/menu/${meal._id}`} className="block">
@@ -22,7 +29,7 @@ export default function MealCard({ meal }) {
         </p>
         <Link
           to={`/menu/${meal._id}`}
-          className="mt-2 block text-xl font-extrabold text-brand-text hover:text-brand-link"
+          className="mt-2 block text-xl font-extrabold text-brand-text transition hover:text-brand-link-dark"
         >
           {meal.name}
         </Link>
@@ -34,7 +41,7 @@ export default function MealCard({ meal }) {
             {money(meal.price)}
           </span>
           <button
-            onClick={() => addItem(meal)}
+            onClick={addAndCheckout}
             className="rounded-xl bg-brand-primary px-4 py-2 text-sm font-bold text-white transition hover:bg-brand-primary-dark"
           >
             Add +

@@ -3,7 +3,7 @@
   top: 0;
   z-index: 30;
   border-bottom: 1px solid var(--border);
-  background: rgb(255 249 244 / 96%);
+  background: rgb(255 249 244 / 94%);
   backdrop-filter: blur(12px);
 }
 
@@ -158,9 +158,29 @@
   padding: 0.68rem 1.45rem 0.68rem 2rem;
 }
 
+@media (max-width: 900px) {
+  .header__secondary-inner {
+    padding: 0.6rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .header__secondary .header__nav-link {
+    font-size: 1.03rem;
+    padding: 0.5rem 0.68rem;
+  }
+
+  .header__search {
+    min-width: 10rem;
+  }
+}
+
 .header__secondary .header__navigation {
   margin-left: 1rem;
   justify-content: center;
+}
+
+.header__secondary .header__navigation {
+  gap: 0.5rem;
 }
 
 .header__secondary .header__search {
@@ -174,14 +194,36 @@
 }
 
 .header__secondary .header__nav-link {
-  color: var(--secondary-dark);
+  color: var(--secondary);
+  background: transparent;
   font-size: 1.2rem;
   font-weight: 900;
   padding: 0.56rem 0.8rem;
 }
 
+.header__secondary .header__nav-link:visited {
+  color: var(--secondary);
+}
+
 .header__secondary .header__nav-link--active {
   color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.header__secondary .header__nav-link--active:visited {
+  color: var(--primary);
+}
+
+.header__secondary .header__nav-link:hover,
+.header__secondary .header__nav-link:focus-visible {
+  color: var(--secondary);
+  background: #fbeae0;
+}
+
+.header__secondary .header__nav-link--active:hover,
+.header__secondary .header__nav-link--active:focus-visible {
+  color: var(--primary);
+  background: var(--primary-soft);
 }
 
 .header__actions {
@@ -231,6 +273,13 @@
   transition: background 160ms ease, transform 160ms ease;
 }
 
+.header__signup,
+.header__signup:visited,
+.header__signup:hover,
+.header__signup:focus {
+  color: white;
+}
+
 .header__signup:hover,
 .header__logout:hover {
   background: var(--primary-action);
@@ -252,6 +301,16 @@
   background: var(--secondary-soft);
   color: var(--text);
   transform: translateY(-1px);
+}
+
+.header__signup:focus-visible,
+.header__login:focus-visible,
+.header__logout:focus-visible,
+.header__cart:focus-visible,
+.header__nav-link:focus-visible,
+.header__search button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .header__logout {
@@ -286,6 +345,14 @@
     position: sticky;
     top: 68px;
     z-index: 29;
+  }
+
+  .header__secondary-inner {
+    padding: 0.55rem 0.75rem;
+  }
+
+  .header__secondary .header__navigation {
+    margin-left: 0;
   }
 
   .header__secondary .header__search {

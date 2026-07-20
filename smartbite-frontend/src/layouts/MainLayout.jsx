@@ -5,7 +5,7 @@ export default function MainLayout() {
   return (
     <div className="flex min-h-screen flex-col bg-brand-background text-brand-text">
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 py-8 md:py-10">
         <Outlet />
       </main>
       <Footer />

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
 import { getMenuItem } from '../services/menuService';
@@ -14,6 +14,7 @@ import { extract } from './pageHelpers';
 
 export default function MealDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [meal, setMeal] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [myReviewId, setMyReviewId] = useState('');
@@ -125,12 +126,17 @@ export default function MealDetails() {
     }
   };
 
+  const addAndCheckout = () => {
+    addItem(meal);
+    navigate('/checkout');
+  };
+
   if (!meal) return <div className="p-20 text-center">Loading your meal…</div>;
   return (
-    <section className="mx-auto max-w-6xl px-5 py-16">
+    <section className="mx-auto max-w-6xl px-5 py-12 md:py-16">
       <div className="grid gap-10 md:grid-cols-2">
         <img
-          className="h-96 w-full rounded-[2rem] bg-brand-secondary-soft object-contain p-3"
+          className="h-64 w-full rounded-[2rem] bg-brand-secondary-soft object-contain p-3 sm:h-80 md:h-96"
           src={imageFor(meal)}
           alt={meal.name}
         />
@@ -138,7 +144,7 @@ export default function MealDetails() {
           <p className="font-bold uppercase tracking-widest text-brand-muted">
             {meal.category?.name || 'Fresh kitchen'}
           </p>
-          <h1 className="mt-3 text-5xl font-black">{meal.name}</h1>
+          <h1 className="mt-3 text-3xl font-black sm:text-4xl md:text-5xl">{meal.name}</h1>
           <p className="mt-6 text-lg leading-8 text-brand-muted">
             {meal.description}
           </p>
@@ -146,12 +152,12 @@ export default function MealDetails() {
             {money(meal.price)}
           </p>
           <div className="mt-6 flex items-center gap-3 text-brand-muted">
-            <span className="text-lg">{averageRating ? `★ ${averageRating}/5` : 'No ratings yet'}</span>
+            <span className="text-lg text-brand-rating">{averageRating ? `★ ${averageRating}/5` : 'No ratings yet'}</span>
             <span className="text-sm">({reviews.length} review{reviews.length === 1 ? '' : 's'})</span>
           </div>
           <button
-            onClick={() => addItem(meal)}
-            className="mt-7 w-fit rounded-2xl bg-brand-primary px-7 py-4 font-black text-white transition hover:bg-brand-primary-dark"
+            onClick={addAndCheckout}
+            className="mt-7 w-full rounded-2xl bg-brand-primary px-7 py-4 font-black text-white transition hover:bg-brand-primary-dark sm:w-fit"
           >
             Add to cart +
           </button>
@@ -219,7 +225,7 @@ export default function MealDetails() {
                 <li key={item.id} className="rounded-2xl border border-brand-border bg-brand-surface p-4">
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-black text-brand-secondary-dark">{item.user?.name || 'Customer'}</p>
-                    <p className="text-sm font-bold text-brand-muted">★ {item.rating}/5</p>
+                    <p className="text-sm font-bold text-brand-rating">★ {item.rating}/5</p>
                   </div>
                   <p className="mt-2 text-sm leading-6 text-brand-text">{item.review}</p>
                 </li>

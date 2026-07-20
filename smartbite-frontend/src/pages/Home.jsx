@@ -15,15 +15,11 @@ export default function Home() {
   return (
     <>
       <HeroBanner />
-      <section className="mx-auto max-w-7xl px-5 py-20">
-        <div className="flex items-end justify-between">
+      <section className="page-shell py-14 md:py-20">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-black uppercase tracking-[.18em] text-brand-muted">
-              The favourites
-            </p>
-            <h2 className="mt-2 text-4xl font-black tracking-tight">
-              Made with heart.
-            </h2>
+            <p className="section-kicker">The favourites</p>
+            <h2 className="section-title max-w-xl">Made with heart.</h2>
           </div>
           <Link className="font-bold text-brand-link hover:underline" to="/menu">
             See all meals →
@@ -34,8 +30,8 @@ export default function Home() {
             ? meals.map((meal) => <MealCard key={meal._id} meal={meal} />)
             : ['Smoky Jollof', 'SmartBite Burger', 'Garden Fresh Bowl'].map(
                 (name, i) => (
-                  <div key={name} className="rounded-3xl bg-brand-secondary-soft p-7">
-                    <p className="text-5xl">{['🍛', '🍔', '🥗'][i]}</p>
+                  <div key={name} className="content-card p-6 md:p-7">
+                    <p className="text-4xl sm:text-5xl">{['🍛', '🍔', '🥗'][i]}</p>
                     <h3 className="mt-5 text-xl font-black">{name}</h3>
                     <p className="mt-2 text-brand-muted">
                       Kitchen favourites are loading for you.
@@ -46,14 +42,12 @@ export default function Home() {
         </div>
       </section>
       <section className="bg-brand-primary-soft">
-        <div className="mx-auto max-w-7xl px-5 py-16 text-center">
-          <p className="text-sm font-black uppercase tracking-widest text-brand-muted">
-            Your table is ready
-          </p>
-          <h2 className="mt-3 text-4xl font-black">Hungry? Let’s fix that.</h2>
+        <div className="page-shell py-16 text-center">
+          <p className="section-kicker">Your table is ready</p>
+          <h2 className="section-title mt-3">Hungry? Let’s fix that.</h2>
           <Link
             to="/menu"
-            className="mt-7 inline-block rounded-2xl bg-brand-primary px-6 py-3.5 font-bold text-white transition hover:bg-brand-primary-dark"
+            className="cta-link mt-7 inline-block rounded-2xl bg-brand-primary px-6 py-3.5 font-bold text-white transition hover:bg-brand-primary-dark"
           >
             Order something delicious
           </Link>

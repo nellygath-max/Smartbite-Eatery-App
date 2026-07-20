@@ -6,6 +6,7 @@ import {
   updateMenuCategory,
 } from '../../services/menuService';
 import { getApiErrorMessage } from '../../utils/apiError';
+import { toneSoft } from '../../utils/statusStyles';
 import { extract } from '../pageHelpers';
 import { Message } from '../shared';
 
@@ -88,7 +89,7 @@ export default function CategoriesManagement() {
         onSubmit={submit}
         className="mt-7 rounded-3xl bg-brand-surface p-6 shadow-sm"
       >
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 className="text-xl font-black">
             {editingCategoryId ? 'Edit category' : 'Add a category'}
           </h2>
@@ -102,7 +103,7 @@ export default function CategoriesManagement() {
             </button>
           )}
         </div>
-        <div className="mt-5 grid gap-4 md:grid-cols-[1fr_2fr_auto]">
+        <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-[1fr_2fr_auto]">
           <input
             required
             name="name"
@@ -124,7 +125,7 @@ export default function CategoriesManagement() {
             }))}
             className="rounded-xl border border-brand-border bg-brand-surface p-3 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15"
           />
-          <button className="rounded-xl bg-brand-primary px-5 py-3 font-bold text-white transition hover:bg-brand-primary-dark">
+          <button className="rounded-xl bg-brand-primary px-5 py-3 font-bold text-white transition hover:bg-brand-primary-dark md:col-span-2 lg:col-span-1">
             {editingCategoryId ? 'Save changes' : 'Add category'}
           </button>
         </div>
@@ -149,17 +150,17 @@ export default function CategoriesManagement() {
                   </p>
                 )}
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => startEdit(category)}
-                  className="font-bold text-brand-primary"
+                  className="rounded-xl bg-brand-primary px-4 py-2 font-bold text-white transition hover:bg-brand-primary-dark"
                   type="button"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => remove(category._id)}
-                  className="font-bold text-brand-status-danger"
+                  className={`rounded-xl border border-brand-status-danger/30 px-4 py-2 font-bold transition hover:bg-brand-status-danger/15 ${toneSoft('danger')}`}
                   type="button"
                 >
                   Delete

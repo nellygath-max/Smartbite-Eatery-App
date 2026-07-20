@@ -37,7 +37,7 @@ export default function ReviewsManagement() {
         ) : (
           <ul className="space-y-4">
             {reviews.map((item) => (
-              <li key={item.id} className="rounded-2xl border border-brand-border bg-white p-4">
+              <li key={item.id} className="rounded-2xl border border-brand-border bg-brand-surface p-4 transition hover:shadow-md">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="font-black text-brand-secondary-dark">{item.menuItem?.name || 'Menu item'}</p>
                   <p className="text-sm font-bold text-brand-muted">★ {item.rating}/5</p>

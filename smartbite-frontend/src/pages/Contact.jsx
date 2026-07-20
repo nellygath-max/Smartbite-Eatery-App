@@ -5,11 +5,11 @@ export default function Contact() {
   return (
     <section className="mx-auto max-w-5xl px-5 py-16 md:py-24">
       <div className="grid overflow-hidden rounded-[2rem] bg-brand-secondary-dark md:grid-cols-2">
-        <div className="p-8 text-white md:p-12">
+        <div className="p-6 text-white sm:p-8 md:p-12">
           <p className="text-sm font-bold uppercase tracking-widest text-brand-primary-soft">
             Say hello
           </p>
-          <h1 className="mt-3 text-4xl font-black">
+          <h1 className="mt-3 text-3xl font-black sm:text-4xl">
             We’d love to hear from you.
           </h1>
           <div className="mt-10 space-y-5 text-brand-secondary-soft">
@@ -23,7 +23,7 @@ export default function Contact() {
             e.preventDefault();
             setSent(true);
           }}
-          className="bg-brand-surface p-8 md:p-12"
+          className="bg-brand-surface p-6 sm:p-8 md:p-12"
         >
           <Field label="Your name" required />
           <div className="mt-4">
