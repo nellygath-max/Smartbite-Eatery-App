@@ -25,6 +25,8 @@ export default function Menu() {
           'Could not load the menu. Please make sure the API is running.'
         )
       );
+    // Scroll to top when page loads
+    window.scrollTo(0, 0);
   }, []);
   const categoryOf = (meal) =>
     meal.category?.name || meal.category || 'Kitchen favourites';
@@ -44,6 +46,15 @@ export default function Menu() {
     }),
     {}
   );
+  const categoryOrder = ['Nigerian Dishes', 'Soups', 'Salads', 'Quick Bites', 'Drinks', 'Desserts'];
+  const sortedGrouped = Object.entries(grouped).sort(([a], [b]) => {
+    const aIndex = categoryOrder.indexOf(a);
+    const bIndex = categoryOrder.indexOf(b);
+    if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
+    if (aIndex === -1) return 1;
+    if (bIndex === -1) return -1;
+    return aIndex - bIndex;
+  });
   return (
     <section className="page-shell py-14">
       <p className="section-kicker">Kitchen menu</p>
@@ -80,7 +91,7 @@ export default function Menu() {
         </div>
       </div>
       <Message error={error} />
-      {Object.entries(grouped).map(([name, group]) => (
+      {sortedGrouped.map(([name, group]) => (
         <div key={name} className="mt-10">
           <h2 className="text-2xl font-black">{name}</h2>
           <div className="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

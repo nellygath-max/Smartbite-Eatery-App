@@ -17,7 +17,7 @@
   --color-brand-secondary-soft: #e6f2f3;
   --color-brand-link: #2c6fb0;
   --color-brand-link-dark: #1f5891;
-  --color-brand-link-visited: #6b4fa0;
+  --color-brand-link-visited: #2c6fb0;
 
   --color-brand-status-success: #2f7d4f;
   --color-brand-status-success-soft: #e8f3ec;
@@ -203,6 +203,14 @@ img {
 .cta-outline-link:hover,
 .cta-outline-link:focus {
   color: var(--secondary-soft);
+}
+
+/* Meal card title - lock to charcoal color */
+.meal-card-title,
+.meal-card-title:visited,
+.meal-card-title:hover,
+.meal-card-title:focus {
+  color: #2b2724 !important;
 }
 
 .footer-links .footer-link,

@@ -29,7 +29,7 @@ export default function MealCard({ meal }) {
         </p>
         <Link
           to={`/menu/${meal._id}`}
-          className="mt-2 block text-xl font-extrabold text-brand-text transition hover:text-brand-link-dark"
+          className="meal-card-title mt-2 block text-xl font-extrabold !text-brand-text transition"
         >
           {meal.name}
         </Link>
@@ -37,7 +37,7 @@ export default function MealCard({ meal }) {
           {meal.description}
         </p>
         <div className="mt-5 flex items-center justify-between gap-3">
-          <span className="text-lg font-black text-brand-secondary-dark">
+          <span className="text-lg font-black !text-brand-text">
             {money(meal.price)}
           </span>
           <button

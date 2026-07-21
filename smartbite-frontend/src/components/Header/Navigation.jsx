@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 
 const links = [
   { label: 'Home', to: '/' },
@@ -9,7 +9,7 @@ const links = [
   { label: 'My Orders', to: '/orders' },
 ];
 
-export default function Navigation() {
+export default function Navigation({ onLinkClick, isMobile }) {
   return (
     <nav className="header__navigation" aria-label="Main navigation">
       {links.map(({ label, to }) => (
@@ -17,6 +17,7 @@ export default function Navigation() {
           key={to}
           to={to}
           end={to === '/'}
+          onClick={onLinkClick}
           className={({ isActive }) =>
             `header__nav-link${isActive ? ' header__nav-link--active' : ''}`
           }
@@ -24,6 +25,11 @@ export default function Navigation() {
           {label}
         </NavLink>
       ))}
+      {isMobile && (
+        <Link to="/login" onClick={onLinkClick} className="header__nav-link">
+          Login
+        </Link>
+      )}
     </nav>
   );
 }

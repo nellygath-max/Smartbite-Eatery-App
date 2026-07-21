@@ -21,12 +21,14 @@ const paymentMethodLabel = (method) => {
 
 const paymentStatusLabel = (status) => (status === 'paid' ? 'Paid' : 'Unpaid');
 
-const deliveryStatusOptions = ['ready', 'out_for_delivery', 'delivered'];
+const deliveryStatusOptions = ['pending', 'ready', 'out_for_delivery', 'delivered', 'cancelled'];
 
 const deliveryBadgeClass = (status) => {
   if (status === 'delivered') return toneSolid('success');
+  if (status === 'cancelled') return toneSolid('danger');
   if (status === 'out_for_delivery') return toneSolid('info');
-  return toneSolid('warning');
+  if (status === 'ready') return toneSolid('warning');
+  return toneSolid('neutral');
 };
 
 export default function DeliveryOrders() {
@@ -107,19 +109,22 @@ export default function DeliveryOrders() {
                   {orderStatusLabel(order.status)}
                 </span>
               </div>
-              <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
                 {deliveryStatusOptions.map((stage, index) => {
                   const activeIndex = deliveryStatusOptions.indexOf(order.status);
                   const safeActiveIndex = activeIndex >= 0 ? activeIndex : 0;
                   const isComplete = index <= safeActiveIndex;
                   const isCurrent = index === safeActiveIndex;
+                  const isCancelled = order.status === 'cancelled';
                   return (
                     <div
                       key={stage}
                       className={`rounded-2xl border px-3 py-3 text-center text-xs font-bold capitalize transition ${
-                        isComplete
-                          ? 'border-brand-primary bg-brand-primary text-white'
-                          : 'border-brand-border bg-brand-surface text-brand-muted'
+                        isCancelled && stage === 'cancelled'
+                          ? 'border-brand-status-danger bg-brand-status-danger-soft text-brand-status-danger'
+                          : isComplete
+                            ? 'border-brand-primary bg-brand-primary text-white'
+                            : 'border-brand-border bg-brand-surface text-brand-muted'
                       } ${isCurrent ? 'shadow-lg shadow-brand-primary/15' : ''}`}
                     >
                       <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-[11px] font-black">
