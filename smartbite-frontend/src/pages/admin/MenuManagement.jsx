@@ -4,6 +4,7 @@ import {
   deleteMenuItem,
   getMenuCategories,
   getMenuItems,
+  restockMenuItem,
   updateMenuItem,
 } from '../../services/menuService';
 import { money } from '../../utils/format';
@@ -25,6 +26,8 @@ export default function MenuManagement() {
   });
   const [editingMealId, setEditingMealId] = useState('');
   const [formResetKey, setFormResetKey] = useState(0);
+  const [restockAmounts, setRestockAmounts] = useState({});
+  const [restockingId, setRestockingId] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const load = async () => {
@@ -116,6 +119,28 @@ export default function MenuManagement() {
       await load();
     } catch (err) {
       setError(getApiErrorMessage(err, 'Unable to remove this menu item.'));
+    }
+  };
+
+  const restock = async (meal) => {
+    const quantity = Number(restockAmounts[meal._id]);
+    if (!Number.isInteger(quantity) || quantity < 1) {
+      setError('Enter a whole number of meals to add to stock.');
+      return;
+    }
+
+    setError('');
+    setSuccess('');
+    setRestockingId(meal._id);
+    try {
+      await restockMenuItem(meal._id, quantity);
+      setRestockAmounts((current) => ({ ...current, [meal._id]: '' }));
+      setSuccess(`${meal.name} restocked by ${quantity}.`);
+      await load();
+    } catch (restockError) {
+      setError(getApiErrorMessage(restockError, 'Unable to add stock for this meal.'));
+    } finally {
+      setRestockingId('');
     }
   };
   return (
@@ -229,6 +254,7 @@ export default function MenuManagement() {
               <th className="p-4">Meal</th>
               <th>Category</th>
               <th>Price</th>
+              <th>Stock</th>
               <th className="pr-4 text-right">Actions</th>
             </tr>
           </thead>
@@ -238,6 +264,33 @@ export default function MenuManagement() {
                 <td className="p-4 font-bold">{meal.name}</td>
                 <td>{meal.category?.name || '—'}</td>
                 <td>{money(meal.price)}</td>
+                <td>
+                  <div className="flex items-center gap-2">
+                    <span className={`font-bold ${Number(meal.stock) === 0 ? 'text-brand-status-danger' : 'text-brand-secondary-dark'}`}>
+                      {meal.stock}
+                    </span>
+                    <input
+                      aria-label={`Number of ${meal.name} portions to add`}
+                      type="number"
+                      min="1"
+                      placeholder="Add"
+                      value={restockAmounts[meal._id] || ''}
+                      onChange={(event) => setRestockAmounts((current) => ({
+                        ...current,
+                        [meal._id]: event.target.value,
+                      }))}
+                      className="w-18 rounded-lg border border-brand-border bg-brand-surface px-2 py-1.5 text-center outline-none focus:border-brand-primary"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => restock(meal)}
+                      disabled={restockingId === meal._id}
+                      className="rounded-lg border border-brand-primary/30 px-2 py-1.5 text-xs font-bold text-brand-primary transition hover:bg-brand-primary-soft disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {restockingId === meal._id ? 'Adding...' : 'Restock'}
+                    </button>
+                  </div>
+                </td>
                 <td className="p-4">
                   <div className="flex flex-wrap items-center justify-end gap-2">
                   <button

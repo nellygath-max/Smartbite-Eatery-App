@@ -12,4 +12,6 @@ export const deleteMenuCategory = (id) => api.delete(`/menu-categories/${id}`);
 export const createMenuItem = (formData) => api.post('/menu', formData);
 export const updateMenuItem = (id, formData) =>
   api.put(`/menu/${id}`, formData);
+export const restockMenuItem = (id, quantity) =>
+  api.patch(`/menu/${id}/restock`, { quantity });
 export const deleteMenuItem = (id) => api.delete(`/menu/${id}`);

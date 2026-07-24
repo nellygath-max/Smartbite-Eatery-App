@@ -72,22 +72,24 @@ button,
 a {
   -webkit-tap-highlight-color: transparent;
 }
-a {
-  color: var(--accent);
-  text-decoration-color: color-mix(in srgb, var(--accent) 28%, transparent);
-  text-underline-offset: 0.16em;
-  transition: color 0.2s ease, text-decoration-color 0.2s ease;
-}
-a:hover {
-  color: var(--accent-action);
-  text-decoration-color: color-mix(in srgb, var(--accent-action) 65%, transparent);
-}
-a:visited {
-  color: var(--color-brand-link-visited);
-}
-a:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+@layer base {
+  a {
+    color: var(--accent);
+    text-decoration-color: color-mix(in srgb, var(--accent) 28%, transparent);
+    text-underline-offset: 0.16em;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  }
+  a:hover {
+    color: var(--accent-action);
+    text-decoration-color: color-mix(in srgb, var(--accent-action) 65%, transparent);
+  }
+  a:visited {
+    color: var(--color-brand-link-visited);
+  }
+  a:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
 }
 button {
   cursor: pointer;

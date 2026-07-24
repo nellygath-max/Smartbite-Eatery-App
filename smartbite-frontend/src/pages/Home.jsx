@@ -3,8 +3,29 @@ import { Link, useLocation } from 'react-router-dom';
 import HeroBanner from '../components/HeroBanner';
 import MealCard from '../components/MealCard';
 import riceImage from '../assets/rice.jpg';
+import friedRiceImage from '../assets/Fried rice.jpg';
+import hamburgerImage from '../assets/hamburger.jpg';
+import gardenFreshBowlImage from '../assets/garden fresh bowl.jpg';
 import { getMenuItems } from '../services/menuService';
 import { extract } from './pageHelpers';
+
+const featuredMeals = [
+  {
+    name: 'Smoky Jollof',
+    description: 'A rich, smoky take on the Nigerian favourite.',
+    imageUrl: friedRiceImage,
+  },
+  {
+    name: 'SmartBite Burger',
+    description: 'A satisfying burger made fresh for a quick bite.',
+    imageUrl: hamburgerImage,
+  },
+  {
+    name: 'Garden Fresh Bowl',
+    description: 'A colourful, wholesome bowl packed with fresh goodness.',
+    imageUrl: gardenFreshBowlImage,
+  },
+];
 
 export default function Home() {
   const [meals, setMeals] = useState([]);
@@ -46,17 +67,19 @@ export default function Home() {
         <div className="mt-9 grid gap-6 md:grid-cols-3">
           {meals.length
             ? meals.map((meal) => <MealCard key={meal._id} meal={meal} />)
-            : ['Smoky Jollof', 'SmartBite Burger', 'Garden Fresh Bowl'].map(
-                (name, i) => (
-                  <div key={name} className="content-card p-6 md:p-7">
-                    <p className="text-4xl sm:text-5xl">{['🍛', '🍔', '🥗'][i]}</p>
-                    <h3 className="mt-5 text-xl font-black">{name}</h3>
-                    <p className="mt-2 text-brand-muted">
-                      Kitchen favourites are loading for you.
-                    </p>
+            : featuredMeals.map(({ name, description, imageUrl }) => (
+                <article key={name} className="content-card overflow-hidden p-0">
+                  <img
+                    src={imageUrl}
+                    alt={name}
+                    className="h-44 w-full object-cover"
+                  />
+                  <div className="p-6 md:p-7">
+                    <h3 className="text-xl font-black">{name}</h3>
+                    <p className="mt-2 text-brand-muted">{description}</p>
                   </div>
-                )
-              )}
+                </article>
+              ))}
         </div>
       </section>
       <section className="bg-brand-primary-soft">

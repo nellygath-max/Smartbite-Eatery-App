@@ -4,13 +4,14 @@ import heroBanner2 from '../assets/Hero banner 2.png';
 import heroBanner3 from '../assets/Hero banner 3.png';
 import './HeroBanner.css';
 
+const HERO_BANNERS = [heroBanner1, heroBanner2, heroBanner3];
+
 export default function HeroBanner() {
   const [currentHero, setCurrentHero] = useState(0);
-  const heroBanners = [heroBanner1, heroBanner2, heroBanner3];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentHero((prev) => (prev + 1) % heroBanners.length);
+      setCurrentHero((prev) => (prev + 1) % HERO_BANNERS.length);
     }, 5000); // Change hero every 5 seconds
 
     return () => clearInterval(interval);
@@ -19,7 +20,7 @@ export default function HeroBanner() {
   return (
     <section className="hero-banner overflow-hidden text-white">
       <div className="hero-carousel-container">
-        {heroBanners.map((banner, index) => (
+        {HERO_BANNERS.map((banner, index) => (
           <div
             key={index}
             className={`hero-slide ${
@@ -33,7 +34,7 @@ export default function HeroBanner() {
           </div>
         ))}
         <div className="hero-indicators">
-          {heroBanners.map((_, index) => (
+          {HERO_BANNERS.map((_, index) => (
             <button
               key={index}
               className={`hero-indicator ${index === currentHero ? 'active' : ''}`}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getMyOrders } from '../services/orderService';
 import { money, shortDate } from '../utils/format';
 import {
@@ -11,6 +12,7 @@ import {
 import { extract } from './pageHelpers';
 
 const paymentMethodLabel = (method) => {
+  if (method === 'paystack') return 'Paystack';
   if (method === 'payment_on_delivery' || method === 'cash_on_delivery') {
     return 'Payment on delivery';
   }
@@ -23,7 +25,13 @@ export default function MyOrders() {
   const [orders, setOrders] = useState([]);
   const loadOrders = () =>
     getMyOrders()
-      .then(({ data }) => setOrders(extract(data, 'orders')))
+      .then(({ data }) => setOrders(
+        extract(data, 'orders').map((order) => ({
+          ...order,
+          // Accept both the current API field and legacy order responses.
+          status: String(order.status || order.orderStatus || 'pending').toLowerCase(),
+        }))
+      ))
       .catch(() => {});
 
   useEffect(() => {
@@ -129,6 +137,30 @@ export default function MyOrders() {
               })}
             </div>
           </div>
+          {currentOrder.status === 'delivered' && (
+            <div className="mt-6 border-t border-brand-border pt-5">
+              <p className="font-black text-brand-text">How was your meal?</p>
+              <p className="mt-1 text-sm text-brand-muted">
+                Your order has been delivered. Share your experience with other customers.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {currentOrder.items?.map((item) => {
+                  const menuItemId = item.menuItem?._id || item.menuItem;
+                  if (!menuItemId) return null;
+
+                  return (
+                    <Link
+                      key={`${currentOrder._id}-current-review-${menuItemId}`}
+                      to={`/menu/${menuItemId}`}
+                      className="rounded-xl bg-brand-primary px-4 py-2 text-sm font-black text-white transition hover:bg-brand-primary-dark"
+                    >
+                      Review {item.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -180,6 +212,30 @@ export default function MyOrders() {
                 </ul>
               </div>
             </div>
+            {order.status === 'delivered' && (
+              <div className="mt-5 border-t border-brand-border pt-5">
+                <p className="font-black text-brand-text">How was your meal?</p>
+                <p className="mt-1 text-sm text-brand-muted">
+                  Share a review for any meal you received in this order.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {order.items?.map((item) => {
+                    const menuItemId = item.menuItem?._id || item.menuItem;
+                    if (!menuItemId) return null;
+
+                    return (
+                      <Link
+                        key={`${order._id}-review-${menuItemId}`}
+                        to={`/menu/${menuItemId}`}
+                        className="rounded-xl bg-brand-primary px-4 py-2 text-sm font-black text-white transition hover:bg-brand-primary-dark"
+                      >
+                        Review {item.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </article>
         ))}
         {!orders.length && (

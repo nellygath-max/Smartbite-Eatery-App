@@ -13,6 +13,7 @@ import { Message } from '../shared';
 import { extract } from '../pageHelpers';
 
 const paymentMethodLabel = (method) => {
+  if (method === 'paystack') return 'Paystack';
   if (method === 'payment_on_delivery' || method === 'cash_on_delivery') {
     return 'Payment on delivery';
   }
@@ -21,7 +22,16 @@ const paymentMethodLabel = (method) => {
 
 const paymentStatusLabel = (status) => (status === 'paid' ? 'Paid' : 'Unpaid');
 
-const deliveryStatusOptions = ['pending', 'ready', 'out_for_delivery', 'delivered', 'cancelled'];
+// Admins and delivery staff can keep the full order progress up to date.
+const deliveryStatusOptions = [
+  'pending',
+  'confirmed',
+  'preparing',
+  'ready',
+  'out_for_delivery',
+  'delivered',
+  'cancelled',
+];
 
 const deliveryBadgeClass = (status) => {
   if (status === 'delivered') return toneSolid('success');
@@ -36,7 +46,15 @@ export default function DeliveryOrders() {
   const [error, setError] = useState('');
 
   const load = () =>
-    getAllOrders().then(({ data }) => setOrders(extract(data, 'orders')));
+    getAllOrders().then(({ data }) => {
+      const normalizedOrders = extract(data, 'orders').map((order) => ({
+        ...order,
+        // Older API responses may not yet include orderStatus. `status` is
+        // the field used by the existing client and is kept in sync by the API.
+        status: order.status || order.orderStatus || 'pending',
+      }));
+      setOrders(normalizedOrders);
+    });
 
   useEffect(() => {
     load().catch(() => setError('Could not load delivery orders.'));
@@ -89,9 +107,10 @@ export default function DeliveryOrders() {
                 </p>
               </div>
               <select
-                value={deliveryStatusOptions.includes(order.status) ? order.status : 'ready'}
+                value={order.status}
+                disabled={order.status === 'cancelled'}
                 onChange={(e) => setStatus(order._id, e.target.value)}
-                className="w-full cursor-pointer rounded-xl border border-brand-border bg-brand-surface p-2 font-bold capitalize outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15 sm:w-auto"
+                className="w-full cursor-pointer rounded-xl border border-brand-border bg-brand-surface p-2 font-bold capitalize outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
               >
                 {deliveryStatusOptions.map((status) => (
                   <option key={status} value={status}>
@@ -109,13 +128,12 @@ export default function DeliveryOrders() {
                   {orderStatusLabel(order.status)}
                 </span>
               </div>
-              <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-                {deliveryStatusOptions.map((stage, index) => {
-                  const activeIndex = deliveryStatusOptions.indexOf(order.status);
-                  const safeActiveIndex = activeIndex >= 0 ? activeIndex : 0;
-                  const isComplete = index <= safeActiveIndex;
-                  const isCurrent = index === safeActiveIndex;
+              <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-7">
+                {orderStatusStages.map((stage, index) => {
+                  const activeIndex = orderStatusIndex(order.status);
                   const isCancelled = order.status === 'cancelled';
+                  const isComplete = !isCancelled && index <= activeIndex;
+                  const isCurrent = index === activeIndex;
                   return (
                     <div
                       key={stage}
@@ -135,11 +153,6 @@ export default function DeliveryOrders() {
                   );
                 })}
               </div>
-              {orderStatusStages.includes(order.status) && !deliveryStatusOptions.includes(order.status) && (
-                <p className="mt-3 text-xs font-semibold text-brand-muted">
-                  This order is still being prepared by the kitchen/admin team and will become actionable once it is ready.
-                </p>
-              )}
             </div>
           </div>
         ))}

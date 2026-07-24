@@ -4,8 +4,11 @@ import { imageFor, money } from '../utils/format';
 export default function MealCard({ meal }) {
   const { addItem } = useCart();
   const navigate = useNavigate();
+  const stock = Number(meal.stock);
+  const soldOut = !Number.isFinite(stock) || stock < 1 || meal.available === false;
 
   const addAndCheckout = () => {
+    if (soldOut) return;
     addItem(meal);
     navigate('/checkout');
   };
@@ -42,9 +45,10 @@ export default function MealCard({ meal }) {
           </span>
           <button
             onClick={addAndCheckout}
-            className="rounded-xl bg-brand-primary px-4 py-2 text-sm font-bold text-white transition hover:bg-brand-primary-dark"
+            disabled={soldOut}
+            className="rounded-xl bg-brand-primary px-4 py-2 text-sm font-bold text-white transition hover:bg-brand-primary-dark disabled:cursor-not-allowed disabled:bg-brand-muted disabled:opacity-70"
           >
-            Add +
+            {soldOut ? 'Out of stock' : 'Add +'}
           </button>
         </div>
       </div>

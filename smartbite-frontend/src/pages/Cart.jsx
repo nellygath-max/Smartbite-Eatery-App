@@ -69,7 +69,7 @@ export default function Cart() {
           <p className="mt-2 text-3xl font-black">{money(total)}</p>
           <Link
             to="/checkout"
-            className="mt-6 block rounded-xl bg-brand-primary py-3 text-center font-black transition hover:bg-brand-primary-dark"
+            className="mt-6 block rounded-xl bg-brand-primary py-3 text-center font-black text-white transition hover:bg-brand-primary-dark"
           >
             Proceed to checkout
           </Link>

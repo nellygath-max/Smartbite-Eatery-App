@@ -17,6 +17,7 @@ import { Message } from '../shared';
 import { extract } from '../pageHelpers';
 
 const paymentMethodLabel = (method) => {
+  if (method === 'paystack') return 'Paystack';
   if (method === 'payment_on_delivery' || method === 'cash_on_delivery') {
     return 'Payment on delivery';
   }
@@ -115,8 +116,9 @@ export default function OrderManagement() {
               <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
                 <select
                   value={order.status}
+                  disabled={order.status === 'cancelled'}
                   onChange={(e) => setStatus(order._id, e.target.value)}
-                  className="w-full cursor-pointer rounded-xl border border-brand-border bg-brand-surface p-2 font-bold capitalize outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15 sm:w-auto"
+                  className="w-full cursor-pointer rounded-xl border border-brand-border bg-brand-surface p-2 font-bold capitalize outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
                 >
                   {statusOptions.map((status) => (
                     <option key={status} value={status}>

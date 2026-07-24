@@ -1,14 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
 import { getMenuItem } from '../services/menuService';
-import {
-  createReview,
-  getMyReviews,
-  getReviewsByMenuItem,
-  updateReview,
-} from '../services/reviewService';
+import { getReviewsByMenuItem } from '../services/reviewService';
 import { imageFor, money } from '../utils/format';
 import { extract } from './pageHelpers';
 
@@ -17,29 +11,9 @@ export default function MealDetails() {
   const navigate = useNavigate();
   const [meal, setMeal] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [myReviewId, setMyReviewId] = useState('');
-  const [rating, setRating] = useState('5');
-  const [reviewText, setReviewText] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState('');
   const [loadingReviews, setLoadingReviews] = useState(true);
   const { addItem } = useCart();
-  const { user } = useAuth();
-
-  const fetchReviewBundle = useCallback(async () => {
-    const [{ data: reviewsData }, myData] = await Promise.all([
-      getReviewsByMenuItem(id),
-      user ? getMyReviews() : Promise.resolve({ data: { reviews: [] } }),
-    ]);
-    const nextReviews = extract(reviewsData, 'reviews');
-    const mine = user
-      ? extract(myData.data, 'reviews').find(
-          (item) => String(item?.menuItem?._id || item?.menuItem) === String(id)
-        )
-      : null;
-
-    return { nextReviews, mine };
-  }, [id, user]);
+  const soldOut = !meal || Number(meal.stock) < 1 || meal.available === false;
 
   useEffect(() => {
     getMenuItem(id)
@@ -49,22 +23,14 @@ export default function MealDetails() {
 
   useEffect(() => {
     let active = true;
-    fetchReviewBundle()
-      .then(({ nextReviews, mine }) => {
+    getReviewsByMenuItem(id)
+      .then(({ data }) => {
         if (!active) return;
-        setReviews(nextReviews);
-        if (mine) {
-          setMyReviewId(mine.id);
-          setRating(String(mine.rating));
-          setReviewText(mine.review || '');
-        } else {
-          setMyReviewId('');
-        }
+        setReviews(extract(data, 'reviews'));
       })
       .catch(() => {
         if (active) {
           setReviews([]);
-          setMyReviewId('');
         }
       })
       .finally(() => {
@@ -74,59 +40,15 @@ export default function MealDetails() {
     return () => {
       active = false;
     };
-  }, [fetchReviewBundle]);
+  }, [id]);
 
   const averageRating =
     reviews.length > 0
       ? (reviews.reduce((sum, item) => sum + Number(item.rating || 0), 0) / reviews.length).toFixed(1)
       : null;
 
-  const submitReview = async (event) => {
-    event.preventDefault();
-    if (!user) {
-      setFeedback('Please log in before posting a review.');
-      return;
-    }
-
-    const trimmed = reviewText.trim();
-    if (!trimmed) {
-      setFeedback('Please write a short review message.');
-      return;
-    }
-
-    setSubmitting(true);
-    setFeedback('');
-    try {
-      const payload = {
-        menuItem: id,
-        rating: Number(rating),
-        review: trimmed,
-      };
-
-      if (myReviewId) {
-        await updateReview(myReviewId, { rating: payload.rating, review: payload.review });
-      } else {
-        const { data } = await createReview(payload);
-        const createdId = data?.review?.id;
-        if (createdId) setMyReviewId(createdId);
-      }
-
-      setFeedback('Review saved successfully.');
-      const { nextReviews, mine } = await fetchReviewBundle();
-      setReviews(nextReviews);
-      if (mine) {
-        setMyReviewId(mine.id);
-        setRating(String(mine.rating));
-        setReviewText(mine.review || '');
-      }
-    } catch (error) {
-      setFeedback(error?.response?.data?.message || 'Could not save review. Please try again.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   const addAndCheckout = () => {
+    if (soldOut) return;
     addItem(meal);
     navigate('/checkout');
   };
@@ -157,62 +79,15 @@ export default function MealDetails() {
           </div>
           <button
             onClick={addAndCheckout}
-            className="mt-7 w-full rounded-2xl bg-brand-primary px-7 py-4 font-black text-white transition hover:bg-brand-primary-dark sm:w-fit"
+            disabled={soldOut}
+            className="mt-7 w-full rounded-2xl bg-brand-primary px-7 py-4 font-black text-white transition hover:bg-brand-primary-dark disabled:cursor-not-allowed disabled:bg-brand-muted disabled:opacity-70 sm:w-fit"
           >
-            Add to cart +
+            {soldOut ? 'Out of stock' : 'Add to cart +'}
           </button>
         </div>
       </div>
 
-      <div className="mt-14 grid gap-8 lg:grid-cols-2">
-        <form
-          onSubmit={submitReview}
-          className="rounded-3xl border border-brand-border bg-brand-surface p-6 shadow-sm"
-        >
-          <h2 className="text-2xl font-black">Rate and review this meal</h2>
-          <p className="mt-2 text-sm text-brand-muted">
-            Rating and written feedback are submitted together.
-          </p>
-          <label className="mt-5 block text-sm font-bold text-brand-muted" htmlFor="meal-rating">
-            Rating
-          </label>
-          <select
-            id="meal-rating"
-            className="mt-2 w-full rounded-xl border border-brand-border bg-white px-4 py-3"
-            value={rating}
-            onChange={(event) => setRating(event.target.value)}
-            disabled={submitting}
-          >
-            <option value="5">5 - Excellent</option>
-            <option value="4">4 - Very good</option>
-            <option value="3">3 - Good</option>
-            <option value="2">2 - Fair</option>
-            <option value="1">1 - Poor</option>
-          </select>
-
-          <label className="mt-5 block text-sm font-bold text-brand-muted" htmlFor="meal-review">
-            Review
-          </label>
-          <textarea
-            id="meal-review"
-            className="mt-2 min-h-32 w-full rounded-xl border border-brand-border bg-white px-4 py-3"
-            placeholder="Tell others what you liked or what could be better"
-            value={reviewText}
-            onChange={(event) => setReviewText(event.target.value)}
-            disabled={submitting}
-          />
-
-          {feedback ? <p className="mt-3 text-sm text-brand-muted">{feedback}</p> : null}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="mt-5 rounded-xl bg-brand-primary px-6 py-3 font-black text-white transition hover:bg-brand-primary-dark disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {submitting ? 'Saving…' : myReviewId ? 'Update review' : 'Post review'}
-          </button>
-        </form>
-
+      <div className="mt-14">
         <div className="rounded-3xl border border-brand-border bg-white p-6 shadow-sm">
           <h2 className="text-2xl font-black">Customer reviews</h2>
           {loadingReviews ? (

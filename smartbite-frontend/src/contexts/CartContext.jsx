@@ -10,6 +10,9 @@ export function CartProvider({ children }) {
     setItems((current) => {
       const id = meal._id || meal.id;
       const existing = current.find((item) => item._id === id);
+      const stock = Number(meal.stock);
+      const maximumQuantity = Number.isFinite(stock) ? Math.max(0, Math.floor(stock)) : Infinity;
+      if (maximumQuantity < 1 || existing?.quantity >= maximumQuantity) return current;
       return existing
         ? current.map((item) =>
             item._id === id ? { ...item, quantity: item.quantity + 1 } : item
@@ -17,13 +20,19 @@ export function CartProvider({ children }) {
         : [...current, { ...meal, _id: id, quantity: 1 }];
     });
   const updateQuantity = (id, quantity) =>
-    setItems((current) =>
-      quantity < 1
-        ? current.filter((item) => item._id !== id)
-        : current.map((item) =>
-            item._id === id ? { ...item, quantity } : item
-          )
-    );
+    setItems((current) => {
+      if (quantity < 1) return current.filter((item) => item._id !== id);
+
+      return current.flatMap((item) => {
+        if (item._id !== id) return [item];
+        const stock = Number(item.stock);
+        const maximumQuantity = Number.isFinite(stock)
+          ? Math.max(0, Math.floor(stock))
+          : quantity;
+        const nextQuantity = Math.min(quantity, maximumQuantity);
+        return nextQuantity > 0 ? [{ ...item, quantity: nextQuantity }] : [];
+      });
+    });
   const removeItem = (id) =>
     setItems((current) => current.filter((item) => item._id !== id));
   const clearCart = () => setItems([]);

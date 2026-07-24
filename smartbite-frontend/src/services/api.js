@@ -14,8 +14,27 @@ const resolveDefaultApiBaseUrl = () => {
   return `http://${hostname}:3000/api`;
 };
 
+const resolveApiBaseUrl = () => {
+  const configuredApiUrl = import.meta.env.VITE_API_URL;
+  if (!configuredApiUrl || typeof window === 'undefined') {
+    return configuredApiUrl || resolveDefaultApiBaseUrl();
+  }
+
+  const isRemoteDevice = !['localhost', '127.0.0.1'].includes(window.location.hostname);
+  try {
+    const configuredHost = new URL(configuredApiUrl).hostname;
+    if (isRemoteDevice && ['localhost', '127.0.0.1'].includes(configuredHost)) {
+      return resolveDefaultApiBaseUrl();
+    }
+  } catch {
+    // Keep a valid custom relative URL unchanged.
+  }
+
+  return configuredApiUrl;
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || resolveDefaultApiBaseUrl(),
+  baseURL: resolveApiBaseUrl(),
 });
 
 api.interceptors.request.use((config) => {

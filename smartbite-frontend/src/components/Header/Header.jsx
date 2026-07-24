@@ -6,9 +6,12 @@ import Logo from './Logo';
 import Navigation from './Navigation';
 import SearchBar from './SearchBar';
 import UserMenu from './UserMenu';
+import CartIcon from './CartIcon';
+import { useCart } from '../../hooks/useCart';
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const { count } = useCart();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -32,6 +35,7 @@ export default function Header() {
           <span></span>
         </button>
         <div className="header__actions">
+          <CartIcon count={count} />
           <UserMenu user={user} onLogout={leave} />
         </div>
       </div>
