@@ -14,10 +14,24 @@ const resolveDefaultApiBaseUrl = () => {
   return `http://${hostname}:3000/api`;
 };
 
+const withApiPath = (apiUrl) => {
+  if (!apiUrl) return apiUrl;
+  if (apiUrl.startsWith('/')) return apiUrl;
+
+  try {
+    const url = new URL(apiUrl);
+    const pathname = url.pathname.replace(/\/+$/, '');
+    url.pathname = pathname.endsWith('/api') ? pathname : `${pathname}/api`;
+    return url.toString().replace(/\/$/, '');
+  } catch {
+    return apiUrl;
+  }
+};
+
 const resolveApiBaseUrl = () => {
   const configuredApiUrl = import.meta.env.VITE_API_URL;
   if (!configuredApiUrl || typeof window === 'undefined') {
-    return configuredApiUrl || resolveDefaultApiBaseUrl();
+    return withApiPath(configuredApiUrl) || resolveDefaultApiBaseUrl();
   }
 
   const isRemoteDevice = !['localhost', '127.0.0.1'].includes(window.location.hostname);
@@ -30,7 +44,7 @@ const resolveApiBaseUrl = () => {
     // Keep a valid custom relative URL unchanged.
   }
 
-  return configuredApiUrl;
+  return withApiPath(configuredApiUrl);
 };
 
 const api = axios.create({
