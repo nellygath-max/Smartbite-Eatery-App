@@ -24,13 +24,16 @@ S.M.A.R.T Bite is our answer to all three.
 
 ## Links
 
-| Resource | Link |
-| --- | --- |
-| Deployed frontend | Not currently deployed |THIS HAS NOT BEEN SUPPLIED
+| Deployed frontend base URL| 
+https://smartbite-frontend-24fn.onrender.com
 
-| Deployed backend base URL | Not currently deployed |THIS HAS NOT BEEN SUPPLIED
 
-| API documentation | [SmartBite Postman collection](https://web.postman.co/workspace/Chinelo-Onwuegbuna's-Workspace~f7d92af7-485f-4545-82a4-6d13e46fbb64/collection/55946156-850b8bf8-f584-47c4-b42a-0a6e6ec8de58) |
+| Deployed backend base URL |
+https://smartbite-backend-lgje.onrender.com
+
+
+| API documentation | NOTE: select nellygath@gmail.com
+[SmartBite Postman collection](https://web.postman.co/workspace/Chinelo-Onwuegbuna's-Workspace~f7d92af7-485f-4545-82a4-6d13e46fbb64/collection/55946156-850b8bf8-f584-47c4-b42a-0a6e6ec8de58) |
 
 
 | API collection in this repository | [`smartbite-backend/postman/SmartBite API.postman_collection.json`]() |
@@ -270,9 +273,6 @@ Screenshots of key pages (Home, Menu, Cart, Admin Dashboard, etc.).
 
 ## Known limitations
 
-- A deployed frontend and backend URL have not yet been provided or configured in this repository.
-- Automated tests are not configured; the backend test script is currently a placeholder.
-- Paystack payments require a `PAYSTACK_SECRET_KEY` in `smartbite-backend/.env`.
 - Email notifications are not implemented.
 
 
@@ -280,7 +280,6 @@ Screenshots of key pages (Home, Menu, Cart, Admin Dashboard, etc.).
 
 API endpoints were manually tested using Postman.
 Frontend and backend integration was tested successfully.
-No automated testing framework (such as Jest or Supertest) has been configured yet.
 
 
 ## Author

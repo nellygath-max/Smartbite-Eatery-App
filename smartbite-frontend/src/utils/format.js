@@ -4,14 +4,29 @@ export const money = (amount) =>
     currency: 'NGN',
     maximumFractionDigits: 0,
   }).format(amount || 0);
+
 export const imageFor = (meal) =>
   meal?.imageUrl ||
   'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80';
+
 export const shortDate = (value) =>
   value
     ? new Date(value).toLocaleDateString('en-NG', {
+        timeZone: 'Africa/Lagos',
         day: 'numeric',
         month: 'short',
         year: 'numeric',
       })
-    : '—';
+    : '-';
+
+export const dateTime = (value) =>
+  value
+    ? new Date(value).toLocaleString('en-NG', {
+        timeZone: 'Africa/Lagos',
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      })
+    : '-';
