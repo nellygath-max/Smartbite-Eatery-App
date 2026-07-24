@@ -13,6 +13,7 @@ const defaultAllowedOrigins = [
   'http://127.0.0.1:5173',
   'http://localhost:4173',
   'http://127.0.0.1:4173',
+  'https://smartbite-frontend-24fn.onrender.com',
 ];
 const configuredOrigins = (process.env.CORS_ORIGINS || '')
   .split(',')
