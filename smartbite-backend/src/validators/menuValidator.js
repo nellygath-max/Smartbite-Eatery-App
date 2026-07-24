@@ -32,4 +32,12 @@ const updateMenuValidation = [
   handleValidationErrors,
 ];
 
-module.exports = { createMenuValidation, updateMenuValidation };
+const restockMenuValidation = [
+  body('quantity')
+    .isInt({ min: 1 })
+    .withMessage('Restock quantity must be a whole number of at least 1.')
+    .toInt(),
+  handleValidationErrors,
+];
+
+module.exports = { createMenuValidation, updateMenuValidation, restockMenuValidation };

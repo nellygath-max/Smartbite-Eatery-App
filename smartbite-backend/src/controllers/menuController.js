@@ -112,6 +112,35 @@ exports.updateMenuItem = async (req, res) => {
   }
 };
 
+exports.restockMenuItem = async (req, res) => {
+  try {
+    const item = await Menu.findByIdAndUpdate(
+      req.params.id,
+      {
+        $inc: { stock: req.body.quantity },
+        $set: { available: true },
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Menu item not found.' });
+    }
+
+    await item.populate('category');
+    return res.status(200).json({ success: true, item });
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return res.status(400).json({ success: false, message: 'Invalid menu item id.' });
+    }
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+    console.error('Restock menu item error:', err);
+    return res.status(500).json({ success: false, message: 'Server error restocking menu item.' });
+  }
+};
+
 exports.deleteMenuItem = async (req, res) => {
   try {
     const item = await Menu.findByIdAndDelete(req.params.id);

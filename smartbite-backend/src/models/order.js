@@ -58,13 +58,39 @@ const orderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ['payment_on_delivery'],
+      enum: ['payment_on_delivery', 'paystack'],
       default: 'payment_on_delivery',
+    },
+    paymentReference: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
+    },
+    // Paystack transaction ids may exceed JavaScript's safe integer range, so
+    // keep the value as a string exactly as Paystack returns it.
+    transactionId: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
     },
     paymentStatus: {
       type: String,
       enum: ['unpaid', 'paid'],
       default: 'unpaid',
+    },
+    paidAt: {
+      type: Date,
+      default: null,
+    },
+    // Canonical payment-workflow status stored for integrations and reports.
+    // `status` is retained below so the existing admin and delivery screens do
+    // not need a breaking data migration.
+    orderStatus: {
+      type: String,
+      enum: ['pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery', 'delivered', 'cancelled'],
+      default: 'pending',
     },
     status: {
       type: String,
@@ -77,7 +103,9 @@ const orderSchema = new mongoose.Schema(
       maxlength: [500, 'Order notes cannot exceed 500 characters'],
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
 module.exports = mongoose.model('Order', orderSchema);

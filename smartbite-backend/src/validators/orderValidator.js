@@ -14,8 +14,12 @@ const createOrderValidation = [
     .withMessage('Delivery address cannot exceed 300 characters.'),
   body('paymentMethod')
     .optional()
-    .isIn(['payment_on_delivery'])
-    .withMessage('Payment method must be payment_on_delivery.'),
+    .isIn(['payment_on_delivery', 'paystack'])
+    .withMessage('Payment method must be payment_on_delivery or paystack.'),
+  body('paystackChannel')
+    .optional()
+    .isIn(['card', 'bank_transfer'])
+    .withMessage('Choose card or bank_transfer for the Paystack payment type.'),
   body('notes').optional().isString().trim().isLength({ max: 500 }).withMessage('Order notes cannot exceed 500 characters.'),
   handleValidationErrors,
 ];

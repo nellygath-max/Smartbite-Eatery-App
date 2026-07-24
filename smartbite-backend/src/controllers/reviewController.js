@@ -1,5 +1,6 @@
 const Review = require('../models/Review');
 const Menu = require('../models/menu');
+const Order = require('../models/order');
 
 const presentReview = (review) => ({
   id: review._id,
@@ -14,10 +15,26 @@ const presentReview = (review) => ({
 
 exports.createReview = async (req, res, next) => {
   try {
-    const { menuItem, rating, review, orderId } = req.body;
+    const { menuItem, rating, review } = req.body;
     const menu = await Menu.findById(menuItem);
     if (!menu) {
       return res.status(404).json({ success: false, message: 'Menu item not found.' });
+    }
+
+    // A review must come from a customer who received this specific meal.
+    // The eligible order is found on the server so clients cannot submit an
+    // arbitrary order id to bypass the rule.
+    const deliveredOrder = await Order.findOne({
+      user: req.user._id,
+      status: 'delivered',
+      'items.menuItem': menuItem,
+    }).sort({ createdAt: -1 });
+
+    if (!deliveredOrder) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can review this meal after an order containing it has been delivered.',
+      });
     }
 
     const existingReview = await Review.findOne({ menuItem, user: req.user._id });
@@ -33,7 +50,7 @@ exports.createReview = async (req, res, next) => {
       user: req.user._id,
       rating,
       review: review.trim(),
-      order: orderId,
+      order: deliveredOrder._id,
     });
 
     await createdReview.populate({ path: 'menuItem', select: 'name category imageUrl price' });

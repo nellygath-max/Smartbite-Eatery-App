@@ -39,6 +39,14 @@ if (!tokenLifetimeSeconds || tokenLifetimeSeconds > maxTokenLifetimeSeconds) {
 
 const jwtExpiresIn = `${expiryMatch[1]}${expiryMatch[2].toLowerCase()}`;
 
+// These options determine which payment choices Paystack displays in its
+// hosted checkout. Paystack only shows options that are enabled and supported
+// for the business account and its market.
+const paystackPaymentChannels = (process.env.PAYSTACK_PAYMENT_CHANNELS || 'card,bank_transfer')
+  .split(',')
+  .map((channel) => channel.trim())
+  .filter(Boolean);
+
 module.exports = {
   PORT: process.env.PORT || 3000,
   HOST: process.env.HOST || '0.0.0.0',
@@ -49,4 +57,6 @@ module.exports = {
   JWT_EXPIRES_IN: jwtExpiresIn,
   MONGO_URI: mongoUri,
   MONGO_DB_NAME: mongoDbName,
+  PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY || '',
+  PAYSTACK_PAYMENT_CHANNELS: paystackPaymentChannels,
 };
