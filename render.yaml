@@ -1,0 +1,14 @@
+services:
+  - type: web
+    runtime: static
+    name: smartbite-frontend-24fn
+    rootDir: smartbite-frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://smartbite-backend-lgje.onrender.com/api

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/create-static-route-fallbacks.cjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

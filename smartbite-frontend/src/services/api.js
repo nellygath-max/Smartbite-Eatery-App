@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { getRawValue, removeStoredValue } from '../utils/storage';
 
+const productionApiBaseUrl = 'https://smartbite-backend-lgje.onrender.com/api';
+
 const resolveDefaultApiBaseUrl = () => {
   if (typeof window === 'undefined') return 'http://localhost:3000/api';
 
@@ -9,9 +11,7 @@ const resolveDefaultApiBaseUrl = () => {
     return 'http://localhost:3000/api';
   }
 
-  // When frontend is opened from another device on the same network,
-  // call the backend on the same host with backend default port.
-  return `http://${hostname}:3000/api`;
+  return productionApiBaseUrl;
 };
 
 const withApiPath = (apiUrl) => {

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import MealCard from '../components/MealCard';
 import { getMenuItems } from '../services/menuService';
+import { getApiErrorMessage } from '../utils/apiError';
 import { Message } from './shared';
 import { extract } from './pageHelpers';
 export default function Menu() {
@@ -19,11 +20,12 @@ export default function Menu() {
   };
   useEffect(() => {
     getMenuItems()
-      .then(({ data }) => setMeals(extract(data, 'menuItems')))
-      .catch(() =>
-        setError(
-          'Could not load the menu. Please make sure the API is running.'
-        )
+      .then(({ data }) => {
+        setMeals(extract(data, 'menuItems'));
+        setError('');
+      })
+      .catch((err) =>
+        setError(getApiErrorMessage(err, 'Could not load the menu. Please refresh and try again.'))
       );
     // Scroll to top when page loads
     window.scrollTo(0, 0);
