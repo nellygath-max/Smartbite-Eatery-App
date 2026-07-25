@@ -1,6 +1,13 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import {
+  getAdminNotifications,
+  markAdminNotificationRead,
+} from '../services/adminNotificationService';
+import { shortDate } from '../utils/format';
+import bellIcon from '../assets/Bell icon.png';
+import '../components/Header/Header.css';
 
 const navClass = ({ isActive }) =>
   `admin-sidebar-link rounded-xl px-4 py-3 text-sm font-bold transition ${
@@ -13,6 +20,8 @@ export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const isDeliveryStaff = user?.role === 'delivery_staff';
   const navigation = isDeliveryStaff
     ? [{ label: 'Orders', to: '/delivery/orders' }]
@@ -21,9 +30,27 @@ export default function AdminLayout() {
         { label: 'Categories', to: '/admin/categories' },
         { label: 'Menu', to: '/admin/menu' },
         { label: 'Orders', to: '/admin/orders' },
+        { label: 'Contact', to: '/admin/contact' },
         { label: 'Users', to: '/admin/users' },
         { label: 'Reviews', to: '/admin/reviews' },
       ];
+
+  const unreadCount = notifications.filter((notification) => !notification.read).length;
+
+  const loadNotifications = useCallback(() => {
+    if (isDeliveryStaff) return;
+    getAdminNotifications()
+      .then(({ data }) => setNotifications(data?.notifications || []))
+      .catch(() => setNotifications([]));
+  }, [isDeliveryStaff]);
+
+  useEffect(() => {
+    loadNotifications();
+    if (isDeliveryStaff) return undefined;
+
+    const intervalId = setInterval(loadNotifications, 30000);
+    return () => clearInterval(intervalId);
+  }, [isDeliveryStaff, loadNotifications]);
 
   const leaveAdmin = async () => {
     await logout();
@@ -32,6 +59,23 @@ export default function AdminLayout() {
 
   const onNavItemClick = () => {
     setMobileNavOpen(false);
+  };
+
+  const openNotification = async (notification) => {
+    setNotificationsOpen(false);
+    if (!notification.read) {
+      try {
+        await markAdminNotificationRead(notification._id);
+        setNotifications((currentNotifications) => currentNotifications.map((item) => (
+          item._id === notification._id
+            ? { ...item, read: true, readAt: new Date().toISOString() }
+            : item
+        )));
+      } catch {
+        /* The contact message can still be opened if marking read fails. */
+      }
+    }
+    navigate(notification.link);
   };
 
   return (
@@ -90,6 +134,44 @@ export default function AdminLayout() {
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-border bg-brand-surface p-4 shadow-sm">
             <p className="text-sm font-bold text-brand-muted">Admin quick actions</p>
             <div className="flex flex-wrap items-center gap-2">
+              {!isDeliveryStaff && (
+                <div className="header__notifications">
+                  <button
+                    type="button"
+                    className="header__notification-button"
+                    onClick={() => setNotificationsOpen((open) => !open)}
+                    aria-label={`Admin notifications (${unreadCount} unread)`}
+                  >
+                    <img className="header__notification-icon" src={bellIcon} alt="" aria-hidden="true" />
+                    {unreadCount > 0 && (
+                      <span className="header__notification-count">{unreadCount}</span>
+                    )}
+                  </button>
+                  {notificationsOpen && (
+                    <div className="header__notification-panel">
+                      <p className="header__notification-title">Notifications ({unreadCount} unread)</p>
+                      {notifications.length ? (
+                        notifications.map((notification) => (
+                          <button
+                            type="button"
+                            key={notification._id}
+                            className="header__notification-item"
+                            onClick={() => openNotification(notification)}
+                          >
+                            <b>{notification.title}</b>
+                            <span>{notification.message}</span>
+                            <strong>
+                              {notification.read ? 'Read' : 'Unread'} · {shortDate(notification.createdAt)}
+                            </strong>
+                          </button>
+                        ))
+                      ) : (
+                        <p className="header__notification-empty">No admin notifications.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
               <Link to="/" className="rounded-xl border border-brand-border px-4 py-2 text-sm font-bold text-brand-text transition hover:bg-brand-secondary-soft">Home</Link>
               {!isDeliveryStaff && (
                 <Link to="/menu" className="rounded-xl border border-brand-border px-4 py-2 text-sm font-bold text-brand-text transition hover:bg-brand-secondary-soft">Customer Menu</Link>

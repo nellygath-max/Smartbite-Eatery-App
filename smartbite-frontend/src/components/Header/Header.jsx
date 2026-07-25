@@ -10,7 +10,7 @@ import CartIcon from './CartIcon';
 import { useCart } from '../../hooks/useCart';
 import { getPendingReviewNotifications } from '../../services/reviewService';
 import ReviewModal from '../ReviewModal';
-import bellIcon from '../../assets/Bell Icon.jpg';
+import bellIcon from '../../assets/Bell icon.png';
 
 export default function Header() {
   const { user, logout } = useAuth();

@@ -47,6 +47,8 @@ const paystackPaymentChannels = (process.env.PAYSTACK_PAYMENT_CHANNELS || 'card,
   .map((channel) => channel.trim())
   .filter(Boolean);
 
+const smtpPort = Number.parseInt(process.env.SMTP_PORT || '587', 10);
+
 module.exports = {
   PORT: process.env.PORT || 3000,
   HOST: process.env.HOST || '0.0.0.0',
@@ -59,4 +61,11 @@ module.exports = {
   MONGO_DB_NAME: mongoDbName,
   PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY || '',
   PAYSTACK_PAYMENT_CHANNELS: paystackPaymentChannels,
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL || '',
+  SMTP_FROM: process.env.SMTP_FROM || '',
+  SMTP_HOST: process.env.SMTP_HOST || '',
+  SMTP_PORT: Number.isInteger(smtpPort) ? smtpPort : 587,
+  SMTP_SECURE: process.env.SMTP_SECURE === 'true',
+  SMTP_USER: process.env.SMTP_USER || '',
+  SMTP_PASS: process.env.SMTP_PASS || '',
 };

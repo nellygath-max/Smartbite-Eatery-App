@@ -26,6 +26,14 @@ const paymentStatusLabel = (status) => (status === 'paid' ? 'Paid' : 'Unpaid');
 
 const orderTimestamp = (order) => new Date(order.createdAt || order.updatedAt || 0).getTime();
 
+const refundMessage = (order) => {
+  if (order.status !== 'cancelled' || order.paymentStatus !== 'paid') return '';
+  if (order.paymentMethod === 'paystack') {
+    return 'This paid order was cancelled. The restaurant must initiate a Paystack refund to return your money.';
+  }
+  return 'This paid order was cancelled. Please contact the restaurant to receive your payment on delivery refund.';
+};
+
 const normalizeOrder = (order) => ({
   ...order,
   // Accept both the current API field and legacy order responses.
@@ -307,6 +315,11 @@ export default function MyOrders() {
             key={order._id}
             className="rounded-2xl bg-brand-surface p-6 shadow-sm"
           >
+            {refundMessage(order) && (
+              <p className="mb-4 rounded-xl bg-brand-status-warning-soft px-4 py-3 text-sm font-bold text-brand-status-warning">
+                {refundMessage(order)}
+              </p>
+            )}
             <div className="flex justify-between gap-4">
               <div>
                 <b>Order #{order._id?.slice(-6)}</b>

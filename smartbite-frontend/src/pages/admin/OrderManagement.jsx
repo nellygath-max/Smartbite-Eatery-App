@@ -26,6 +26,14 @@ const paymentMethodLabel = (method) => {
 
 const paymentStatusLabel = (status) => (status === 'paid' ? 'Paid' : 'Unpaid');
 
+const refundMessage = (order) => {
+  if (order.status !== 'cancelled' || order.paymentStatus !== 'paid') return '';
+  if (order.paymentMethod === 'paystack') {
+    return 'Refund required: initiate a Paystack refund using the payment reference or transaction id.';
+  }
+  return 'Refund due: return this payment to the customer manually because it was paid on delivery.';
+};
+
 const orderBadgeClass = (status) => {
   if (status === 'delivered') return toneSolid('success');
   if (status === 'cancelled') return toneSolid('danger');
@@ -92,6 +100,11 @@ export default function OrderManagement() {
             className="rounded-3xl border border-brand-border bg-brand-surface p-5 shadow-sm transition hover:shadow-md"
             key={order._id}
           >
+            {refundMessage(order) && (
+              <p className={`alert alert-warning mb-4 text-sm font-bold ${toneSoft('warning')}`}>
+                {refundMessage(order)}
+              </p>
+            )}
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-3">
