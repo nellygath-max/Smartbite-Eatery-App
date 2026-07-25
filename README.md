@@ -205,7 +205,7 @@ Import the [Postman collection](https://web.postman.co/workspace/Chinelo-Onwuegb
 | Sample | `GET /api/sample`, `POST /api/sample` |
 
 ## Screenshots
-Screenshots of key pages (Home, Menu, Cart, Admin Dashboard, etc.). 
+Screenshots of key pages (Home, Menu, Cart, Checkout, Myorders, Admin Dashboard, etc.). 
 
 ## Home
 ![alt text](homepage.PNG)
@@ -272,8 +272,6 @@ Screenshots of key pages (Home, Menu, Cart, Admin Dashboard, etc.).
 ![alt text](review.PNG)
 
 ## Known limitations
-
-- Email notifications are not implemented.
 
 
 ## Testing
