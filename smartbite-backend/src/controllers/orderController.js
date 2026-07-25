@@ -478,6 +478,29 @@ exports.getMyOrders = async (req, res) => {
   }
 };
 
+exports.getMyOrder = async (req, res) => {
+  try {
+    const order = await Order.findOne({ _id: req.params.id, user: req.user._id })
+      .populate({
+        path: 'items.menuItem',
+        select: 'name category imageUrl available',
+        populate: { path: 'category', select: 'name description' },
+      });
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found.' });
+    }
+
+    return res.status(200).json({ success: true, order: normalizeOrderPaymentMethod(order) });
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return res.status(400).json({ success: false, message: 'Invalid order id.' });
+    }
+    console.error('Get my order error:', err);
+    return res.status(500).json({ success: false, message: 'Server error retrieving order.' });
+  }
+};
+
 exports.getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find()

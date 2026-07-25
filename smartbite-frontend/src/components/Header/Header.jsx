@@ -10,6 +10,7 @@ import CartIcon from './CartIcon';
 import { useCart } from '../../hooks/useCart';
 import { getPendingReviewNotifications } from '../../services/reviewService';
 import ReviewModal from '../ReviewModal';
+import bellIcon from '../../assets/Bell Icon.jpg';
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -68,7 +69,7 @@ export default function Header() {
                 onClick={() => setNotificationsOpen((open) => !open)}
                 aria-label={`Notifications (${notifications.length})`}
               >
-                <span aria-hidden="true">🔔</span>
+                <img className="header__notification-icon" src={bellIcon} alt="" aria-hidden="true" />
                 {notifications.length > 0 && (
                   <span className="header__notification-count">{notifications.length}</span>
                 )}

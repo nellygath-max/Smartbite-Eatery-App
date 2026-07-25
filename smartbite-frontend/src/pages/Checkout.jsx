@@ -16,7 +16,7 @@ export default function Checkout() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('paystack');
+  const [paymentMethod, setPaymentMethod] = useState('payment_on_delivery');
   const [paystackChannel, setPaystackChannel] = useState('card');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState('');
@@ -60,7 +60,7 @@ export default function Checkout() {
 
       if (paymentMethod === 'payment_on_delivery') {
         clearCart();
-        navigate('/orders');
+        navigate('/orders', { state: { newOrder: data.order, newOrderId: data.order?._id } });
         return;
       }
 

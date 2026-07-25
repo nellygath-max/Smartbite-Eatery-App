@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getMyOrders } from '../services/orderService';
+import { useLocation } from 'react-router-dom';
+import { getMyOrder, getMyOrders } from '../services/orderService';
 import { createReview, getPendingReviewNotifications } from '../services/reviewService';
 import { dateTime, money, shortDate } from '../utils/format';
 import {
@@ -10,6 +11,8 @@ import {
   orderStatusStages,
 } from '../utils/orderStatus';
 import { extract } from './pageHelpers';
+import { getApiErrorMessage } from '../utils/apiError';
+import { Message } from './shared';
 
 const paymentMethodLabel = (method) => {
   if (method === 'paystack') return 'Paystack';
@@ -22,6 +25,20 @@ const paymentMethodLabel = (method) => {
 const paymentStatusLabel = (status) => (status === 'paid' ? 'Paid' : 'Unpaid');
 
 const orderTimestamp = (order) => new Date(order.createdAt || order.updatedAt || 0).getTime();
+
+const normalizeOrder = (order) => ({
+  ...order,
+  // Accept both the current API field and legacy order responses.
+  status: String(order.status || order.orderStatus || 'pending').toLowerCase(),
+});
+
+const mergeOrders = (currentOrders, incomingOrders) => {
+  const byId = new Map();
+  [...currentOrders, ...incomingOrders].forEach((order) => {
+    if (order?._id) byId.set(order._id, normalizeOrder(order));
+  });
+  return [...byId.values()].sort((a, b) => orderTimestamp(b) - orderTimestamp(a));
+};
 
 function ReviewForm({ orderId, item, onSubmitted }) {
   const [rating, setRating] = useState('5');
@@ -101,8 +118,13 @@ function ReviewForm({ orderId, item, onSubmitted }) {
 }
 
 export default function MyOrders() {
-  const [orders, setOrders] = useState([]);
+  const { state } = useLocation();
+  const newOrder = state?.newOrder;
+  const newOrderId = state?.newOrderId;
+  const [orders, setOrders] = useState(() => (newOrder ? [normalizeOrder(newOrder)] : []));
   const [pendingReviewIds, setPendingReviewIds] = useState(new Set());
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const loadPendingReviews = () =>
     getPendingReviewNotifications()
       .then(({ data }) => setPendingReviewIds(
@@ -111,18 +133,24 @@ export default function MyOrders() {
       .catch(() => setPendingReviewIds(new Set()));
   const loadOrders = () =>
     getMyOrders()
-      .then(({ data }) => setOrders(
-        extract(data, 'orders')
-          .map((order) => ({
-            ...order,
-            // Accept both the current API field and legacy order responses.
-            status: String(order.status || order.orderStatus || 'pending').toLowerCase(),
-          }))
-          .sort((a, b) => orderTimestamp(b) - orderTimestamp(a))
-      ))
-      .catch(() => {});
+      .then(({ data }) => {
+        setOrders((currentOrders) => mergeOrders(currentOrders, extract(data, 'orders')));
+        setError('');
+      })
+      .catch((err) => setError(getApiErrorMessage(err, 'Could not load your orders. Please refresh and try again.')))
+      .finally(() => setLoading(false));
 
   useEffect(() => {
+    if (newOrderId && !newOrder) {
+      getMyOrder(newOrderId)
+        .then(({ data }) => {
+          if (data?.order) {
+            setOrders((currentOrders) => mergeOrders(currentOrders, [data.order]));
+          }
+        })
+        .catch(() => {});
+    }
+
     loadOrders();
     loadPendingReviews();
 
@@ -131,7 +159,7 @@ export default function MyOrders() {
     }, 15000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [newOrder, newOrderId]);
 
   const refreshAfterReview = () => {
     loadOrders();
@@ -139,11 +167,11 @@ export default function MyOrders() {
   };
 
   const currentOrder = useMemo(() => {
-    const activeOrder = orders.find(
-      (order) => !['delivered', 'cancelled'].includes(order.status)
-    );
-    return activeOrder || orders[0] || null;
-  }, [orders]);
+    if (newOrderId) {
+      return orders.find((order) => order._id === newOrderId) || orders[0] || null;
+    }
+    return orders[0] || null;
+  }, [newOrderId, orders]);
 
   return (
     <section className="mx-auto max-w-5xl px-5 py-14">
@@ -151,8 +179,14 @@ export default function MyOrders() {
       <p className="mt-3 text-brand-muted">
         Review your past orders and track the latest status updates here.
       </p>
+      <Message error={error} />
+      {loading && (
+        <p className="mt-8 rounded-2xl bg-brand-secondary-soft p-8 text-brand-muted">
+          Loading your orders...
+        </p>
+      )}
 
-      {currentOrder && (
+      {!loading && currentOrder && (
         <div className="mt-8 rounded-3xl border border-brand-border bg-brand-surface p-6 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
@@ -350,7 +384,7 @@ export default function MyOrders() {
             )}
           </article>
         ))}
-        {!orders.length && (
+        {!loading && !orders.length && !error && (
           <p className="rounded-2xl bg-brand-secondary-soft p-8 text-brand-muted">
             No orders yet. Your next delicious meal is waiting.
           </p>

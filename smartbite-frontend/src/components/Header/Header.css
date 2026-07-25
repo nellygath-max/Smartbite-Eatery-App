@@ -267,6 +267,13 @@
   font-size: 1.1rem;
 }
 
+.header__notification-icon {
+  width: 1.45rem;
+  height: 1.45rem;
+  object-fit: contain;
+  display: block;
+}
+
 .header__notification-count {
   position: absolute;
   top: -0.3rem;

@@ -290,4 +290,4 @@ Frontend and backend integration was tested successfully.
 
 | Cohort 7
 
-| Submission date | 21 July 2026 |
+| Submission date | 25 July 2026 |
