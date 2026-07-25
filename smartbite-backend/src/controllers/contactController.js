@@ -5,7 +5,18 @@ const {
   sendCustomerContactConfirmation,
 } = require('../services/mailService');
 
-const sendCustomerContactConfirmationInBackground = async (contactMessage) => {
+const sendContactEmailsInBackground = async (contactMessage) => {
+  try {
+    const adminEmail = await sendAdminContactEmail(contactMessage);
+    console.log('Admin contact email notification sent:', {
+      messageId: adminEmail.messageId,
+      accepted: adminEmail.accepted,
+      rejected: adminEmail.rejected,
+    });
+  } catch (mailErr) {
+    console.error('Admin contact email notification error:', mailErr);
+  }
+
   try {
     const customerEmail = await sendCustomerContactConfirmation(contactMessage);
     console.log('Customer contact email confirmation sent:', {
@@ -29,26 +40,11 @@ exports.createContactMessage = async (req, res) => {
 
     await createContactAdminNotification(contactMessage);
 
-    try {
-      const adminEmail = await sendAdminContactEmail(contactMessage);
-      console.log('Admin contact email notification sent:', {
-        messageId: adminEmail.messageId,
-        accepted: adminEmail.accepted,
-        rejected: adminEmail.rejected,
-      });
-    } catch (mailErr) {
-      console.error('Admin contact email notification error:', mailErr);
-      return res.status(502).json({
-        success: false,
-        message: 'Your message was saved, but the admin email notification could not be sent. Please check the email server settings and try again.',
-      });
-    }
-
-    sendCustomerContactConfirmationInBackground(contactMessage);
+    sendContactEmailsInBackground(contactMessage);
 
     return res.status(201).json({
       success: true,
-      message: 'Thanks for contacting SmartBite. Your message was sent to the admin.',
+      message: 'Thanks for contacting SmartBite. Your message was received.',
       contactMessage,
     });
   } catch (err) {
