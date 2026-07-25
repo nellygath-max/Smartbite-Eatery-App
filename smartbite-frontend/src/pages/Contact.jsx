@@ -14,11 +14,12 @@ export default function Contact() {
 
   const submit = async (event) => {
     event.preventDefault();
+    const form = event.currentTarget;
     setSent(false);
     setError('');
     setSubmitting(true);
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
     try {
       await sendContactMessage({
         name: formData.get('name'),
@@ -26,7 +27,7 @@ export default function Contact() {
         subject: formData.get('subject'),
         message: formData.get('message'),
       });
-      event.currentTarget.reset();
+      form.reset();
       setSent(true);
     } catch (err) {
       setError(getApiErrorMessage(err, 'Unable to send your message right now.'));
