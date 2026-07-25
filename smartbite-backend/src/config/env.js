@@ -48,6 +48,7 @@ const paystackPaymentChannels = (process.env.PAYSTACK_PAYMENT_CHANNELS || 'card,
   .filter(Boolean);
 
 const smtpPort = Number.parseInt(process.env.SMTP_PORT || '587', 10);
+const smtpSecure = String(process.env.SMTP_SECURE || '').trim().toLowerCase() === 'true';
 
 module.exports = {
   PORT: process.env.PORT || 3000,
@@ -65,7 +66,7 @@ module.exports = {
   SMTP_FROM: process.env.SMTP_FROM || '',
   SMTP_HOST: process.env.SMTP_HOST || '',
   SMTP_PORT: Number.isInteger(smtpPort) ? smtpPort : 587,
-  SMTP_SECURE: process.env.SMTP_SECURE === 'true',
+  SMTP_SECURE: smtpSecure,
   SMTP_USER: process.env.SMTP_USER || '',
   SMTP_PASS: process.env.SMTP_PASS || '',
 };

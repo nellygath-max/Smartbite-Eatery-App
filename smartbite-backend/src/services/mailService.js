@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const dns = require('dns');
 const {
   ADMIN_EMAIL,
   SMTP_FROM,
@@ -9,17 +10,34 @@ const {
   SMTP_USER,
 } = require('../config/env');
 
+dns.setDefaultResultOrder('ipv4first');
+
 let transporter;
+let loggedMailConfig = false;
 
 const createTransporter = () => {
   if (!SMTP_HOST) {
     throw new Error('SMTP_HOST is not configured.');
   }
 
+  if (!loggedMailConfig) {
+    console.log('SMTP mail config loaded:', {
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: SMTP_SECURE,
+      user: SMTP_USER,
+      from: SMTP_FROM || ADMIN_EMAIL,
+      adminEmail: ADMIN_EMAIL,
+      hasPassword: Boolean(SMTP_PASS),
+    });
+    loggedMailConfig = true;
+  }
+
   return nodemailer.createTransport({
     host: SMTP_HOST,
     port: SMTP_PORT,
     secure: SMTP_SECURE,
+    family: 4,
     connectionTimeout: 10_000,
     greetingTimeout: 10_000,
     socketTimeout: 20_000,
