@@ -272,7 +272,7 @@ Screenshots of key pages (Home, Menu, Cart, Checkout, Myorders, Admin Dashboard,
 ![alt text](review.PNG)
 
 ## Known limitations
-
+- Admin email notifications are not yet functioning in the deployed application because of an unresolved SMTP connection issue. All orders are still successfully saved to the database and displayed in the admin dashboard.
 
 ## Testing
 
