@@ -3,6 +3,7 @@ const { handleValidationErrors } = require('./validation');
 
 const createReviewValidation = [
   body('menuItem').isMongoId().withMessage('Provide a valid menu item id.'),
+  body('orderId').isMongoId().withMessage('Provide a valid order id.'),
   body('rating').isInt({ min: 1, max: 5 }).withMessage('Rating must be between 1 and 5.').toInt(),
   body('review')
     .trim()
@@ -10,7 +11,6 @@ const createReviewValidation = [
     .withMessage('Review text is required.')
     .isLength({ max: 1000 })
     .withMessage('Review text cannot exceed 1000 characters.'),
-  body('orderId').optional().isMongoId().withMessage('Provide a valid order id.'),
   handleValidationErrors,
 ];
 

@@ -15,6 +15,7 @@ const reviewSchema = new mongoose.Schema(
     order: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Order',
+      required: [true, 'Order is required for a review'],
     },
     rating: {
       type: Number,
@@ -35,6 +36,6 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
-reviewSchema.index({ menuItem: 1, user: 1 }, { unique: true });
+reviewSchema.index({ order: 1, menuItem: 1, user: 1 }, { unique: true });
 
 module.exports = mongoose.model('Review', reviewSchema);

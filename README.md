@@ -44,7 +44,7 @@ https://smartbite-backend-lgje.onrender.com
 - Add meals to a persistent browser cart and place orders.
 - Register, sign in, manage a profile, and view personal order history.
 - Leave and update meal reviews.
-- Manage menu items and images, menu categories, users, reviews, and orders from the admin area.smartbite-backend/postman/SmartBite%20API.postman_collection.json
+- Manage menu items and images, menu categories, users, reviews, and orders from  the admin area.
 - Update delivery order status as an administrator or delivery staff member.
 
 ## Tech stack

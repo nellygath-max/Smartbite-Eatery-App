@@ -6,6 +6,8 @@ export default function MealCard({ meal }) {
   const navigate = useNavigate();
   const stock = Number(meal.stock);
   const soldOut = !Number.isFinite(stock) || stock < 1 || meal.available === false;
+  const rating = Number(meal.averageRating || 0);
+  const reviewCount = Number(meal.reviewCount || 0);
 
   const addAndCheckout = () => {
     if (soldOut) return;
@@ -38,6 +40,10 @@ export default function MealCard({ meal }) {
         </Link>
         <p className="mt-2 line-clamp-2 min-h-10 text-sm leading-5 text-brand-muted">
           {meal.description}
+        </p>
+        <p className="mt-3 text-sm font-bold text-brand-muted">
+          <span className="text-brand-rating">★★★★★</span>{' '}
+          {reviewCount ? `${rating.toFixed(1)} (${reviewCount} Review${reviewCount === 1 ? '' : 's'})` : 'No reviews yet'}
         </p>
         <div className="mt-5 flex items-center justify-between gap-3">
           <span className="text-lg font-black !text-brand-text">

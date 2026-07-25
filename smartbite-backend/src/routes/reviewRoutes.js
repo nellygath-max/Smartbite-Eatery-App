@@ -5,6 +5,7 @@ const {
   getReviews,
   getReviewsByMenuItem,
   getMyReviews,
+  getPendingReviewNotifications,
   updateReview,
 } = require('../controllers/reviewController');
 const {
@@ -18,6 +19,7 @@ const router = express.Router();
 router.post('/', authenticate, createReviewValidation, createReview);
 router.get('/', getReviews);
 router.get('/menu/:menuItemId', menuItemIdValidation, getReviewsByMenuItem);
+router.get('/pending', authenticate, getPendingReviewNotifications);
 router.get('/my-reviews', authenticate, getMyReviews);
 router.patch('/:id', authenticate, updateReviewValidation, updateReview);
 

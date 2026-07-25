@@ -7,6 +7,8 @@ export const getReviewsByMenuItem = (menuItemId) =>
 
 export const getMyReviews = () => api.get('/reviews/my-reviews');
 
+export const getPendingReviewNotifications = () => api.get('/reviews/pending');
+
 export const createReview = (payload) => api.post('/reviews', payload);
 
 export const updateReview = (id, payload) => api.patch(`/reviews/${id}`, payload);

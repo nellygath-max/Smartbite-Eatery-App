@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import HeroBanner from '../components/HeroBanner';
 import MealCard from '../components/MealCard';
+import PendingReviewPanel from '../components/PendingReviewPanel';
 import riceImage from '../assets/rice.jpg';
 import friedRiceImage from '../assets/Fried rice.jpg';
 import hamburgerImage from '../assets/hamburger.jpg';
@@ -54,6 +55,7 @@ export default function Home() {
   return (
     <>
       <HeroBanner />
+      <PendingReviewPanel />
       <section className="page-shell py-14 md:py-20">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>

@@ -108,18 +108,20 @@ const normalizeOrderPaymentMethod = (order) => {
       ...order.toObject(),
       paymentMethod: normalizedPaymentMethod,
     };
+    const normalizedStatus = normalizedOrder.orderStatus || normalizedOrder.status || 'pending';
     return {
       ...normalizedOrder,
-      // Orders created before orderStatus was introduced retain their legacy
-      // status while still returning the new API field.
-      orderStatus: normalizedOrder.orderStatus || normalizedOrder.status,
+      status: normalizedStatus,
+      orderStatus: normalizedStatus,
     };
   }
 
+  const normalizedStatus = order.orderStatus || order.status || 'pending';
   return {
     ...order,
     paymentMethod: normalizedPaymentMethod,
-    orderStatus: order.orderStatus || order.status,
+    status: normalizedStatus,
+    orderStatus: normalizedStatus,
   };
 };
 
@@ -468,7 +470,7 @@ exports.getMyOrders = async (req, res) => {
         select: 'name category imageUrl available',
         populate: { path: 'category', select: 'name description' },
       })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1, _id: -1 });
     return res.status(200).json({ success: true, orders: orders.map(normalizeOrderPaymentMethod) });
   } catch (err) {
     console.error('Get my orders error:', err);
@@ -480,7 +482,7 @@ exports.getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find()
       .populate(orderPopulate)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1, _id: -1 });
     return res.status(200).json({ success: true, orders: orders.map(normalizeOrderPaymentMethod) });
   } catch (err) {
     console.error('Get orders error:', err);

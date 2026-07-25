@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { getMyOrders } from '../services/orderService';
-import { money, shortDate } from '../utils/format';
+import { createReview, getPendingReviewNotifications } from '../services/reviewService';
+import { dateTime, money, shortDate } from '../utils/format';
 import {
   orderStatusIndex,
   orderStatusClass,
@@ -21,21 +21,110 @@ const paymentMethodLabel = (method) => {
 
 const paymentStatusLabel = (status) => (status === 'paid' ? 'Paid' : 'Unpaid');
 
+const orderTimestamp = (order) => new Date(order.createdAt || order.updatedAt || 0).getTime();
+
+function ReviewForm({ orderId, item, onSubmitted }) {
+  const [rating, setRating] = useState('5');
+  const [review, setReview] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const menuItemId = item.menuItem?._id || item.menuItem;
+
+  const submit = async (event) => {
+    event.preventDefault();
+    if (!menuItemId) return;
+    setMessage('');
+    setError('');
+    setSubmitting(true);
+
+    try {
+      await createReview({
+        orderId,
+        menuItem: menuItemId,
+        rating: Number(rating),
+        review,
+      });
+      setReview('');
+      setRating('5');
+      setMessage('Thanks for sharing your review.');
+      onSubmitted?.();
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Unable to submit this review right now.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (!menuItemId) return null;
+
+  return (
+    <form onSubmit={submit} className="rounded-2xl border border-brand-border bg-brand-surface p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="font-black text-brand-text">{item.name}</p>
+        <label className="text-sm font-bold text-brand-text">
+          Rating
+          <select
+            value={rating}
+            onChange={(event) => setRating(event.target.value)}
+            className="ml-2 rounded-lg border border-brand-border bg-white px-3 py-2 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15"
+          >
+            {[5, 4, 3, 2, 1].map((value) => (
+              <option key={value} value={value}>
+                {value}/5
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <textarea
+        required
+        minLength={3}
+        maxLength={500}
+        value={review}
+        onChange={(event) => setReview(event.target.value)}
+        rows="3"
+        placeholder="How did it taste?"
+        className="mt-3 w-full rounded-xl border border-brand-border p-3 text-sm outline-none transition focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15"
+      />
+      <button
+        type="submit"
+        disabled={submitting}
+        className="mt-3 rounded-xl bg-brand-primary px-4 py-2 text-sm font-black text-white transition hover:bg-brand-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {submitting ? 'Submitting...' : 'Submit review'}
+      </button>
+      {message && <p className="mt-2 text-sm font-bold text-brand-status-success">{message}</p>}
+      {error && <p className="mt-2 text-sm font-bold text-brand-status-danger">{error}</p>}
+    </form>
+  );
+}
+
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
+  const [pendingReviewIds, setPendingReviewIds] = useState(new Set());
+  const loadPendingReviews = () =>
+    getPendingReviewNotifications()
+      .then(({ data }) => setPendingReviewIds(
+        new Set((data?.notifications || []).map((item) => `${item.orderId}:${item.menuItemId}`))
+      ))
+      .catch(() => setPendingReviewIds(new Set()));
   const loadOrders = () =>
     getMyOrders()
       .then(({ data }) => setOrders(
-        extract(data, 'orders').map((order) => ({
-          ...order,
-          // Accept both the current API field and legacy order responses.
-          status: String(order.status || order.orderStatus || 'pending').toLowerCase(),
-        }))
+        extract(data, 'orders')
+          .map((order) => ({
+            ...order,
+            // Accept both the current API field and legacy order responses.
+            status: String(order.status || order.orderStatus || 'pending').toLowerCase(),
+          }))
+          .sort((a, b) => orderTimestamp(b) - orderTimestamp(a))
       ))
       .catch(() => {});
 
   useEffect(() => {
     loadOrders();
+    loadPendingReviews();
 
     const intervalId = setInterval(() => {
       loadOrders();
@@ -43,6 +132,11 @@ export default function MyOrders() {
 
     return () => clearInterval(intervalId);
   }, []);
+
+  const refreshAfterReview = () => {
+    loadOrders();
+    loadPendingReviews();
+  };
 
   const currentOrder = useMemo(() => {
     const activeOrder = orders.find(
@@ -95,7 +189,7 @@ export default function MyOrders() {
                 Ordered
               </p>
               <p className="mt-1 text-lg font-black text-brand-secondary-dark">
-                {shortDate(currentOrder.createdAt)}
+                {dateTime(currentOrder.createdAt)}
               </p>
             </div>
             <div className="rounded-2xl bg-brand-secondary-soft p-4">
@@ -143,19 +237,28 @@ export default function MyOrders() {
               <p className="mt-1 text-sm text-brand-muted">
                 Your order has been delivered. Share your experience with other customers.
               </p>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-3 grid gap-3">
                 {currentOrder.items?.map((item) => {
                   const menuItemId = item.menuItem?._id || item.menuItem;
                   if (!menuItemId) return null;
+                  if (!pendingReviewIds.has(`${currentOrder._id}:${menuItemId}`)) {
+                    return (
+                      <p
+                        key={`${currentOrder._id}-current-reviewed-${menuItemId}`}
+                        className="rounded-xl bg-brand-status-success-soft px-4 py-3 text-sm font-bold text-brand-status-success"
+                      >
+                        {item.name} reviewed
+                      </p>
+                    );
+                  }
 
                   return (
-                    <Link
+                    <ReviewForm
                       key={`${currentOrder._id}-current-review-${menuItemId}`}
-                      to={`/menu/${menuItemId}`}
-                      className="rounded-xl bg-brand-primary px-4 py-2 text-sm font-black text-white transition hover:bg-brand-primary-dark"
-                    >
-                      Review {item.name}
-                    </Link>
+                      orderId={currentOrder._id}
+                      item={item}
+                      onSubmitted={refreshAfterReview}
+                    />
                   );
                 })}
               </div>
@@ -218,19 +321,28 @@ export default function MyOrders() {
                 <p className="mt-1 text-sm text-brand-muted">
                   Share a review for any meal you received in this order.
                 </p>
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-3 grid gap-3">
                   {order.items?.map((item) => {
                     const menuItemId = item.menuItem?._id || item.menuItem;
                     if (!menuItemId) return null;
+                    if (!pendingReviewIds.has(`${order._id}:${menuItemId}`)) {
+                      return (
+                        <p
+                          key={`${order._id}-reviewed-${menuItemId}`}
+                          className="rounded-xl bg-brand-status-success-soft px-4 py-3 text-sm font-bold text-brand-status-success"
+                        >
+                          {item.name} reviewed
+                        </p>
+                      );
+                    }
 
                     return (
-                      <Link
+                      <ReviewForm
                         key={`${order._id}-review-${menuItemId}`}
-                        to={`/menu/${menuItemId}`}
-                        className="rounded-xl bg-brand-primary px-4 py-2 text-sm font-black text-white transition hover:bg-brand-primary-dark"
-                      >
-                        Review {item.name}
-                      </Link>
+                        orderId={order._id}
+                        item={item}
+                        onSubmitted={refreshAfterReview}
+                      />
                     );
                   })}
                 </div>
@@ -247,3 +359,4 @@ export default function MyOrders() {
     </section>
   );
 }
+

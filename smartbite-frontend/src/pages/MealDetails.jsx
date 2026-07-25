@@ -11,7 +11,6 @@ export default function MealDetails() {
   const navigate = useNavigate();
   const [meal, setMeal] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [loadingReviews, setLoadingReviews] = useState(true);
   const { addItem } = useCart();
   const soldOut = !meal || Number(meal.stock) < 1 || meal.available === false;
 
@@ -22,30 +21,10 @@ export default function MealDetails() {
   }, [id]);
 
   useEffect(() => {
-    let active = true;
     getReviewsByMenuItem(id)
-      .then(({ data }) => {
-        if (!active) return;
-        setReviews(extract(data, 'reviews'));
-      })
-      .catch(() => {
-        if (active) {
-          setReviews([]);
-        }
-      })
-      .finally(() => {
-        if (active) setLoadingReviews(false);
-      });
-
-    return () => {
-      active = false;
-    };
+      .then(({ data }) => setReviews(extract(data, 'reviews')))
+      .catch(() => setReviews([]));
   }, [id]);
-
-  const averageRating =
-    reviews.length > 0
-      ? (reviews.reduce((sum, item) => sum + Number(item.rating || 0), 0) / reviews.length).toFixed(1)
-      : null;
 
   const addAndCheckout = () => {
     if (soldOut) return;
@@ -53,7 +32,10 @@ export default function MealDetails() {
     navigate('/checkout');
   };
 
-  if (!meal) return <div className="p-20 text-center">Loading your meal…</div>;
+  if (!meal) return <div className="p-20 text-center">Loading your meal...</div>;
+  const reviewCount = Number(meal.reviewCount || reviews.length || 0);
+  const averageRating = Number(meal.averageRating || 0);
+
   return (
     <section className="mx-auto max-w-6xl px-5 py-12 md:py-16">
       <div className="grid gap-10 md:grid-cols-2">
@@ -73,10 +55,10 @@ export default function MealDetails() {
           <p className="mt-7 text-3xl font-black text-brand-secondary-dark">
             {money(meal.price)}
           </p>
-          <div className="mt-6 flex items-center gap-3 text-brand-muted">
-            <span className="text-lg text-brand-rating">{averageRating ? `★ ${averageRating}/5` : 'No ratings yet'}</span>
-            <span className="text-sm">({reviews.length} review{reviews.length === 1 ? '' : 's'})</span>
-          </div>
+          <p className="mt-4 text-sm font-bold text-brand-muted">
+            <span className="text-brand-rating">★★★★★</span>{' '}
+            {reviewCount ? `${averageRating.toFixed(1)} (${reviewCount} Review${reviewCount === 1 ? '' : 's'})` : 'No reviews yet'}
+          </p>
           <button
             onClick={addAndCheckout}
             disabled={soldOut}
@@ -86,29 +68,22 @@ export default function MealDetails() {
           </button>
         </div>
       </div>
-
-      <div className="mt-14">
-        <div className="rounded-3xl border border-brand-border bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-black">Customer reviews</h2>
-          {loadingReviews ? (
-            <p className="mt-4 text-brand-muted">Loading reviews…</p>
-          ) : reviews.length === 0 ? (
-            <p className="mt-4 text-brand-muted">No reviews yet. Be the first to leave one.</p>
-          ) : (
-            <ul className="mt-5 space-y-4">
-              {reviews.map((item) => (
-                <li key={item.id} className="rounded-2xl border border-brand-border bg-brand-surface p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="font-black text-brand-secondary-dark">{item.user?.name || 'Customer'}</p>
-                    <p className="text-sm font-bold text-brand-rating">★ {item.rating}/5</p>
-                  </div>
-                  <p className="mt-2 text-sm leading-6 text-brand-text">{item.review}</p>
-                </li>
-              ))}
-            </ul>
+      <section className="mt-12 rounded-3xl border border-brand-border bg-brand-surface p-6 shadow-sm">
+        <h2 className="text-2xl font-black">Customer reviews</h2>
+        <div className="mt-5 grid gap-4">
+          {reviews.length ? reviews.map((item) => (
+            <article key={item.id} className="rounded-2xl bg-brand-secondary-soft p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="font-black text-brand-secondary-dark">{item.user?.name || 'Customer'}</p>
+                <p className="font-bold text-brand-rating">★★★★★ {item.rating}/5</p>
+              </div>
+              <p className="mt-2 text-sm leading-6 text-brand-text">{item.review}</p>
+            </article>
+          )) : (
+            <p className="text-brand-muted">No customer reviews yet.</p>
           )}
         </div>
-      </div>
+      </section>
     </section>
   );
 }

@@ -13,35 +13,85 @@ const presentReview = (review) => ({
   updatedAt: review.updatedAt,
 });
 
+const recalculateMenuRating = async (menuItem) => {
+  const [summary] = await Review.aggregate([
+    { $match: { menuItem } },
+    {
+      $group: {
+        _id: '$menuItem',
+        averageRating: { $avg: '$rating' },
+        reviewCount: { $sum: 1 },
+      },
+    },
+  ]);
+
+  await Menu.findByIdAndUpdate(menuItem, {
+    averageRating: summary ? Number(summary.averageRating.toFixed(1)) : 0,
+    reviewCount: summary?.reviewCount || 0,
+  });
+};
+
+const pendingReviewItemsForUser = async (userId) => {
+  const deliveredOrders = await Order.find({
+    user: userId,
+    $or: [{ status: 'delivered' }, { orderStatus: 'delivered' }],
+  })
+    .populate({ path: 'items.menuItem', select: 'name imageUrl averageRating reviewCount' })
+    .sort({ createdAt: -1, _id: -1 });
+
+  const reviews = await Review.find({
+    user: userId,
+    order: { $in: deliveredOrders.map((order) => order._id) },
+  }).select('order menuItem');
+  const reviewed = new Set(
+    reviews.map((review) => `${review.order.toString()}:${review.menuItem.toString()}`)
+  );
+
+  return deliveredOrders.flatMap((order) => order.items
+    .filter((item) => item.menuItem && !reviewed.has(`${order._id}:${item.menuItem._id || item.menuItem}`))
+    .map((item) => ({
+      id: `${order._id}-${item.menuItem._id || item.menuItem}`,
+      orderId: order._id,
+      orderNumber: order._id.toString().slice(-6),
+      menuItem: item.menuItem,
+      menuItemId: item.menuItem._id || item.menuItem,
+      foodName: item.name,
+      deliveredAt: order.updatedAt,
+      message: `Please review your ${item.name} order.`,
+    })));
+};
+
 exports.createReview = async (req, res, next) => {
   try {
-    const { menuItem, rating, review } = req.body;
+    const { menuItem, orderId, rating, review } = req.body;
     const menu = await Menu.findById(menuItem);
     if (!menu) {
       return res.status(404).json({ success: false, message: 'Menu item not found.' });
     }
 
-    // A review must come from a customer who received this specific meal.
-    // The eligible order is found on the server so clients cannot submit an
-    // arbitrary order id to bypass the rule.
     const deliveredOrder = await Order.findOne({
+      _id: orderId,
       user: req.user._id,
-      status: 'delivered',
+      $or: [{ status: 'delivered' }, { orderStatus: 'delivered' }],
       'items.menuItem': menuItem,
-    }).sort({ createdAt: -1 });
+    });
 
     if (!deliveredOrder) {
       return res.status(403).json({
         success: false,
-        message: 'You can review this meal after an order containing it has been delivered.',
+        message: 'You can review this meal only after your delivered order containing it.',
       });
     }
 
-    const existingReview = await Review.findOne({ menuItem, user: req.user._id });
+    const existingReview = await Review.findOne({
+      order: deliveredOrder._id,
+      menuItem,
+      user: req.user._id,
+    });
     if (existingReview) {
       return res.status(409).json({
         success: false,
-        message: 'You have already reviewed this menu item.',
+        message: 'You have already reviewed this item from this order.',
       });
     }
 
@@ -52,6 +102,7 @@ exports.createReview = async (req, res, next) => {
       review: review.trim(),
       order: deliveredOrder._id,
     });
+    await recalculateMenuRating(menu._id);
 
     await createdReview.populate({ path: 'menuItem', select: 'name category imageUrl price' });
     await createdReview.populate({ path: 'user', select: 'name email' });
@@ -66,6 +117,16 @@ exports.createReview = async (req, res, next) => {
     }
     console.error('Create review error:', err);
     return res.status(500).json({ success: false, message: 'Server error creating review.' });
+  }
+};
+
+exports.getPendingReviewNotifications = async (req, res) => {
+  try {
+    const notifications = await pendingReviewItemsForUser(req.user._id);
+    return res.status(200).json({ success: true, notifications, count: notifications.length });
+  } catch (err) {
+    console.error('Get pending reviews error:', err);
+    return res.status(500).json({ success: false, message: 'Server error retrieving review notifications.' });
   }
 };
 
@@ -125,6 +186,7 @@ exports.updateReview = async (req, res) => {
     if (reviewText !== undefined) review.review = reviewText.trim();
 
     await review.save();
+    await recalculateMenuRating(review.menuItem);
     await review.populate({ path: 'menuItem', select: 'name category imageUrl price' });
 
     return res.status(200).json({ success: true, review: presentReview(review) });
