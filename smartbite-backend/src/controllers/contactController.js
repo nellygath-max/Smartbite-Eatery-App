@@ -2,6 +2,22 @@ const ContactMessage = require('../models/contactMessage');
 const { createContactAdminNotification } = require('./adminNotificationController');
 const { sendContactEmails } = require('../services/mailService');
 
+const sendContactEmailsInBackground = async (contactMessage) => {
+  try {
+    const emailResults = await sendContactEmails(contactMessage);
+
+    if (emailResults.adminEmail.status === 'rejected') {
+      console.error('Admin contact email notification error:', emailResults.adminEmail.reason);
+    }
+
+    if (emailResults.customerEmail.status === 'rejected') {
+      console.error('Customer contact email confirmation error:', emailResults.customerEmail.reason);
+    }
+  } catch (mailErr) {
+    console.error('Contact email notification error:', mailErr);
+  }
+};
+
 exports.createContactMessage = async (req, res) => {
   try {
     const contactMessage = await ContactMessage.create({
@@ -13,25 +29,11 @@ exports.createContactMessage = async (req, res) => {
 
     await createContactAdminNotification(contactMessage);
 
-    const emailResults = await sendContactEmails(contactMessage);
-
-    if (emailResults.adminEmail.status === 'rejected') {
-      console.error('Admin contact email notification error:', emailResults.adminEmail.reason);
-      return res.status(502).json({
-        success: false,
-        message: 'Your message was saved, but the admin email notification could not be sent. Please check the email server settings and try again.',
-      });
-    }
-
-    if (emailResults.customerEmail.status === 'rejected') {
-      console.error('Customer contact email confirmation error:', emailResults.customerEmail.reason);
-    }
+    sendContactEmailsInBackground(contactMessage);
 
     return res.status(201).json({
       success: true,
-      message: emailResults.customerEmail.status === 'fulfilled'
-        ? 'Thanks for contacting SmartBite. We sent your message and confirmation email successfully.'
-        : 'Thanks for contacting SmartBite. We sent your message to the admin, but the confirmation email could not be sent.',
+      message: 'Thanks for contacting SmartBite. Your message was sent to the admin.',
       contactMessage,
     });
   } catch (err) {
