@@ -13,19 +13,25 @@ exports.createContactMessage = async (req, res) => {
 
     await createContactAdminNotification(contactMessage);
 
-    try {
-      await sendContactEmails(contactMessage);
-    } catch (mailErr) {
-      console.error('Contact email notification error:', mailErr);
+    const emailResults = await sendContactEmails(contactMessage);
+
+    if (emailResults.adminEmail.status === 'rejected') {
+      console.error('Admin contact email notification error:', emailResults.adminEmail.reason);
       return res.status(502).json({
         success: false,
-        message: 'Your message was saved, but email notifications could not be sent. Please try again later.',
+        message: 'Your message was saved, but the admin email notification could not be sent. Please check the email server settings and try again.',
       });
+    }
+
+    if (emailResults.customerEmail.status === 'rejected') {
+      console.error('Customer contact email confirmation error:', emailResults.customerEmail.reason);
     }
 
     return res.status(201).json({
       success: true,
-      message: 'Thanks for contacting SmartBite. We sent your message and confirmation email successfully.',
+      message: emailResults.customerEmail.status === 'fulfilled'
+        ? 'Thanks for contacting SmartBite. We sent your message and confirmation email successfully.'
+        : 'Thanks for contacting SmartBite. We sent your message to the admin, but the confirmation email could not be sent.',
       contactMessage,
     });
   } catch (err) {

@@ -88,8 +88,15 @@ const sendCustomerContactConfirmation = async (contactMessage) => (
 );
 
 const sendContactEmails = async (contactMessage) => {
-  await sendAdminContactEmail(contactMessage);
-  await sendCustomerContactConfirmation(contactMessage);
+  const [adminEmail, customerEmail] = await Promise.allSettled([
+    sendAdminContactEmail(contactMessage),
+    sendCustomerContactConfirmation(contactMessage),
+  ]);
+
+  return {
+    adminEmail,
+    customerEmail,
+  };
 };
 
 module.exports = {
