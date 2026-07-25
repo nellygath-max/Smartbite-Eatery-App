@@ -1,9 +1,6 @@
 const ContactMessage = require('../models/contactMessage');
 const { createContactAdminNotification } = require('./adminNotificationController');
-const {
-  sendAdminContactEmail,
-  sendCustomerContactConfirmation,
-} = require('../services/mailService');
+const { sendAdminContactEmail } = require('../services/mailService');
 
 const sendContactEmailsInBackground = async (contactMessage) => {
   try {
@@ -17,16 +14,6 @@ const sendContactEmailsInBackground = async (contactMessage) => {
     console.error('Admin contact email notification error:', mailErr);
   }
 
-  try {
-    const customerEmail = await sendCustomerContactConfirmation(contactMessage);
-    console.log('Customer contact email confirmation sent:', {
-      messageId: customerEmail.messageId,
-      accepted: customerEmail.accepted,
-      rejected: customerEmail.rejected,
-    });
-  } catch (mailErr) {
-    console.error('Customer contact email confirmation error:', mailErr);
-  }
 };
 
 exports.createContactMessage = async (req, res) => {
