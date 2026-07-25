@@ -1,32 +1,20 @@
 const ContactMessage = require('../models/contactMessage');
 const { createContactAdminNotification } = require('./adminNotificationController');
-const { sendContactEmails } = require('../services/mailService');
+const {
+  sendAdminContactEmail,
+  sendCustomerContactConfirmation,
+} = require('../services/mailService');
 
-const sendContactEmailsInBackground = async (contactMessage) => {
+const sendCustomerContactConfirmationInBackground = async (contactMessage) => {
   try {
-    const emailResults = await sendContactEmails(contactMessage);
-
-    if (emailResults.adminEmail.status === 'rejected') {
-      console.error('Admin contact email notification error:', emailResults.adminEmail.reason);
-    } else {
-      console.log('Admin contact email notification sent:', {
-        messageId: emailResults.adminEmail.value.messageId,
-        accepted: emailResults.adminEmail.value.accepted,
-        rejected: emailResults.adminEmail.value.rejected,
-      });
-    }
-
-    if (emailResults.customerEmail.status === 'rejected') {
-      console.error('Customer contact email confirmation error:', emailResults.customerEmail.reason);
-    } else {
-      console.log('Customer contact email confirmation sent:', {
-        messageId: emailResults.customerEmail.value.messageId,
-        accepted: emailResults.customerEmail.value.accepted,
-        rejected: emailResults.customerEmail.value.rejected,
-      });
-    }
+    const customerEmail = await sendCustomerContactConfirmation(contactMessage);
+    console.log('Customer contact email confirmation sent:', {
+      messageId: customerEmail.messageId,
+      accepted: customerEmail.accepted,
+      rejected: customerEmail.rejected,
+    });
   } catch (mailErr) {
-    console.error('Contact email notification error:', mailErr);
+    console.error('Customer contact email confirmation error:', mailErr);
   }
 };
 
@@ -41,7 +29,22 @@ exports.createContactMessage = async (req, res) => {
 
     await createContactAdminNotification(contactMessage);
 
-    sendContactEmailsInBackground(contactMessage);
+    try {
+      const adminEmail = await sendAdminContactEmail(contactMessage);
+      console.log('Admin contact email notification sent:', {
+        messageId: adminEmail.messageId,
+        accepted: adminEmail.accepted,
+        rejected: adminEmail.rejected,
+      });
+    } catch (mailErr) {
+      console.error('Admin contact email notification error:', mailErr);
+      return res.status(502).json({
+        success: false,
+        message: 'Your message was saved, but the admin email notification could not be sent. Please check the email server settings and try again.',
+      });
+    }
+
+    sendCustomerContactConfirmationInBackground(contactMessage);
 
     return res.status(201).json({
       success: true,
