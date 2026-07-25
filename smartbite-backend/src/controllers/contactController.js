@@ -8,10 +8,22 @@ const sendContactEmailsInBackground = async (contactMessage) => {
 
     if (emailResults.adminEmail.status === 'rejected') {
       console.error('Admin contact email notification error:', emailResults.adminEmail.reason);
+    } else {
+      console.log('Admin contact email notification sent:', {
+        messageId: emailResults.adminEmail.value.messageId,
+        accepted: emailResults.adminEmail.value.accepted,
+        rejected: emailResults.adminEmail.value.rejected,
+      });
     }
 
     if (emailResults.customerEmail.status === 'rejected') {
       console.error('Customer contact email confirmation error:', emailResults.customerEmail.reason);
+    } else {
+      console.log('Customer contact email confirmation sent:', {
+        messageId: emailResults.customerEmail.value.messageId,
+        accepted: emailResults.customerEmail.value.accepted,
+        rejected: emailResults.customerEmail.value.rejected,
+      });
     }
   } catch (mailErr) {
     console.error('Contact email notification error:', mailErr);
