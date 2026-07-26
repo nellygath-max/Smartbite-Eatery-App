@@ -1487,6 +1487,215 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Contact message",
+      "item": [
+        {
+          "name": "Create message",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"John Doe\",\r\n  \"email\": \"john@example.com\",\r\n  \"subject\": \"Order question\",\r\n  \"message\": \"Hello SmartBite, I need help with my order.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://smartbite-backend-lgje.onrender.com/api/contact",
+              "protocol": "https",
+              "host": [
+                "smartbite-backend-lgje",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "contact"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Messages",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supabase_service_role_api_key_1bqf}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://smartbite-backend-lgje.onrender.com/api/contact/6a6522b39e18cce7b9445a16",
+              "protocol": "https",
+              "host": [
+                "smartbite-backend-lgje",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "contact",
+                "6a6522b39e18cce7b9445a16"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Messages",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supabase_service_role_api_key_1bqf}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://smartbite-backend-lgje.onrender.com/api/contact/6a6522b39e18cce7b9445a16",
+              "protocol": "https",
+              "host": [
+                "smartbite-backend-lgje",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "contact",
+                "6a6522b39e18cce7b9445a16"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update message",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{supabase_service_role_api_key_1bqf}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"status\": \"Read\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://smartbite-backend-lgje.onrender.com/api/contact/6a6522b39e18cce7b9445a16/status",
+              "protocol": "https",
+              "host": [
+                "smartbite-backend-lgje",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "contact",
+                "6a6522b39e18cce7b9445a16",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a message",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{json_web_token_1bqf}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://smartbite-backend-lgje.onrender.com/api/contact/6a6522b39e18cce7b9445a16",
+              "protocol": "https",
+              "host": [
+                "smartbite-backend-lgje",
+                "onrender",
+                "com"
+              ],
+              "path": [
+                "api",
+                "contact",
+                "6a6522b39e18cce7b9445a16"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -1656,6 +1865,14 @@
     },
     {
       "key": "supabase_service_role_api_key_07vd",
+      "secret": true
+    },
+    {
+      "key": "supabase_service_role_api_key_1bqf",
+      "secret": true
+    },
+    {
+      "key": "json_web_token_1bqf",
       "secret": true
     }
   ]
