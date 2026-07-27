@@ -131,9 +131,12 @@ Configure these variable names as needed. Do not commit secret values.
 
 |`smartbite-frontend/.env` | 
 `VITE_API_URL`=http://localhost:5000/api
+`VITE_PAYSTACK_PUBLIC_KEY`=pk_test_replace-with-your-paystack-public-key
 
 ## Paystack
-`PAYSTACK_SECRET_KEY`=process.env.PAYSTACK_SECRET_KEY
+`PAYSTACK_SECRET_KEY`=sk_test_replace-with-your-paystack-secret-key
+
+Keep `PAYSTACK_SECRET_KEY` in `smartbite-backend/.env` only. Keep the Paystack public key in `smartbite-frontend/.env` as `VITE_PAYSTACK_PUBLIC_KEY`.
 
 ## API summary(link to the full API docs)
 

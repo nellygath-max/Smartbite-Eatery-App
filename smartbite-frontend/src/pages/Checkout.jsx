@@ -11,6 +11,9 @@ import {
 import { imageFor, money } from '../utils/format';
 import { getApiErrorMessage } from '../utils/apiError';
 import { Message } from './shared';
+
+const paystackPublicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
+
 export default function Checkout() {
   const { items, total, clearCart, updateQuantity, removeItem } = useCart();
   const { user } = useAuth();
@@ -56,6 +59,10 @@ export default function Checkout() {
     };
 
     try {
+      if (paymentMethod === 'paystack' && !paystackPublicKey) {
+        throw new Error('Paystack public key is not configured. Please contact support.');
+      }
+
       const { data } = await createOrder(order);
 
       if (paymentMethod === 'payment_on_delivery') {
