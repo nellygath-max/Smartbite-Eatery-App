@@ -49,6 +49,11 @@ const paystackPaymentChannels = (process.env.PAYSTACK_PAYMENT_CHANNELS || 'card,
 
 const smtpPort = Number.parseInt(process.env.SMTP_PORT || '587', 10);
 const smtpSecure = String(process.env.SMTP_SECURE || '').trim().toLowerCase() === 'true';
+const authRateLimitWindowMs = Number.parseInt(
+  process.env.AUTH_RATE_LIMIT_WINDOW_MS || String(15 * 60 * 1000),
+  10
+);
+const authRateLimitMaxAttempts = Number.parseInt(process.env.AUTH_RATE_LIMIT_MAX_ATTEMPTS || '20', 10);
 
 module.exports = {
   PORT: process.env.PORT || 3000,
@@ -69,4 +74,11 @@ module.exports = {
   SMTP_SECURE: smtpSecure,
   SMTP_USER: process.env.SMTP_USER || '',
   SMTP_PASS: process.env.SMTP_PASS || '',
+  TRUST_PROXY: process.env.TRUST_PROXY || 'loopback, linklocal, uniquelocal',
+  AUTH_RATE_LIMIT_WINDOW_MS: Number.isInteger(authRateLimitWindowMs)
+    ? authRateLimitWindowMs
+    : 15 * 60 * 1000,
+  AUTH_RATE_LIMIT_MAX_ATTEMPTS: Number.isInteger(authRateLimitMaxAttempts)
+    ? authRateLimitMaxAttempts
+    : 20,
 };

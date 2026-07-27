@@ -1,12 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const routes = require('./src/routes');
-const { PORT, HOST } = require('./src/config/env');
+const { PORT, HOST, TRUST_PROXY } = require('./src/config/env');
 const { mongoUri, mongoOptions } = require('./src/config/database');
 const mongoose = require('mongoose');
 const path = require('path');
 
 const app = express();
+
+app.set('trust proxy', TRUST_PROXY);
 
 const defaultAllowedOrigins = [
   'http://localhost:5173',

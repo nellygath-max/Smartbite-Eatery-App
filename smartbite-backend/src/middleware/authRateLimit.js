@@ -1,20 +1,21 @@
-const WINDOW_MS = 15 * 60 * 1000;
-const MAX_ATTEMPTS = 5;
+const {
+  AUTH_RATE_LIMIT_MAX_ATTEMPTS,
+  AUTH_RATE_LIMIT_WINDOW_MS,
+} = require('../config/env');
+
 const attempts = new Map();
 
-// Deliberately keyed only by the socket address: do not trust forwarded headers
-// unless this application is explicitly configured with a trusted proxy.
 const authRateLimit = (req, res, next) => {
   const now = Date.now();
-  const key = req.socket.remoteAddress || 'unknown';
+  const key = req.ip || req.socket.remoteAddress || 'unknown';
   const entry = attempts.get(key);
 
   if (!entry || now >= entry.resetAt) {
-    attempts.set(key, { count: 1, resetAt: now + WINDOW_MS });
+    attempts.set(key, { count: 1, resetAt: now + AUTH_RATE_LIMIT_WINDOW_MS });
     return next();
   }
 
-  if (entry.count >= MAX_ATTEMPTS) {
+  if (entry.count >= AUTH_RATE_LIMIT_MAX_ATTEMPTS) {
     const retryAfter = Math.ceil((entry.resetAt - now) / 1000);
     res.set('Retry-After', String(retryAfter));
     return res.status(429).json({
