@@ -12,3 +12,5 @@ services:
     envVars:
       - key: VITE_API_URL
         value: https://smartbite-backend-lgje.onrender.com/api
+      - key: VITE_PAYSTACK_PUBLIC_KEY
+        value: pk_test_24b63bc6a032c1f7fb08b630d530327791794dfe
