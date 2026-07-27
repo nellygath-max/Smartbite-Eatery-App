@@ -50,7 +50,7 @@ export default function Contact() {
             <p>Have a question, feedback, or a special request? Send us a message. We're always happy to help.</p>
             <p>Satellite Town, Lagos</p>
             <p>+2348030922160</p>
-            <p>hello@smartbite.ng</p>
+            <p>fuchemba@gmail.com</p>
           </div>
         </div>
         <form
