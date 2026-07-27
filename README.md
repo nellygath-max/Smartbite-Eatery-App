@@ -32,7 +32,7 @@ https://smartbite-frontend-24fn.onrender.com
 https://smartbite-backend-lgje.onrender.com
 
 
-| API documentation | NOTE: select nellygath@gmail.com
+| API documentation | NOTE: select fuchemba@gmail.com
 [SmartBite Postman collection](https://web.postman.co/workspace/Chinelo-Onwuegbuna's-Workspace~f7d92af7-485f-4545-82a4-6d13e46fbb64/collection/55946156-850b8bf8-f584-47c4-b42a-0a6e6ec8de58) |
 
 
