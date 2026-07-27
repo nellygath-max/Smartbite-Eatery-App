@@ -10,6 +10,27 @@ exports.createContactAdminNotification = (contactMessage) => (
   })
 );
 
+exports.deleteContactAdminNotifications = (contactMessageId) => (
+  AdminNotification.deleteMany({
+    type: 'contact_message',
+    resourceId: contactMessageId,
+  })
+);
+
+exports.markContactAdminNotificationRead = (contactMessageId, read = true) => (
+  AdminNotification.updateMany(
+    {
+      type: 'contact_message',
+      resourceId: contactMessageId,
+    },
+    {
+      read,
+      readAt: read ? new Date() : null,
+    },
+    { runValidators: true }
+  )
+);
+
 exports.getAdminNotifications = async (req, res) => {
   try {
     const notifications = await AdminNotification.find()

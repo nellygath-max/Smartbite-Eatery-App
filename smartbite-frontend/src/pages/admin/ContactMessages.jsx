@@ -16,6 +16,10 @@ const statusClass = (status) => {
   return 'bg-brand-status-warning-soft text-brand-status-warning';
 };
 
+const notifyAdminNotificationsChanged = () => {
+  window.dispatchEvent(new Event('admin-notifications-changed'));
+};
+
 export default function ContactMessages() {
   const { id } = useParams();
   const [messages, setMessages] = useState([]);
@@ -44,9 +48,34 @@ export default function ContactMessages() {
       return;
     }
 
+    let cancelled = false;
+
     getContactMessage(selectedId)
-      .then(({ data }) => setSelectedMessage(data?.message || null))
-      .catch((err) => setError(getApiErrorMessage(err, 'Could not open this contact message.')));
+      .then(async ({ data }) => {
+        let message = data?.message || null;
+        if (message?.status === 'Unread') {
+          const statusResponse = await updateContactMessageStatus(message._id, 'Read');
+          message = statusResponse.data?.message || message;
+          notifyAdminNotificationsChanged();
+        }
+
+        if (cancelled) return;
+        setSelectedMessage(message);
+        if (message) {
+          setMessages((currentMessages) => currentMessages.map((currentMessage) => (
+            currentMessage._id === message._id ? message : currentMessage
+          )));
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(getApiErrorMessage(err, 'Could not open this contact message.'));
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [selectedId]);
 
   const currentMessage = useMemo(
@@ -63,6 +92,7 @@ export default function ContactMessages() {
       setMessages((currentMessages) => currentMessages.map((message) => (
         message._id === data.message._id ? data.message : message
       )));
+      notifyAdminNotificationsChanged();
       setSuccess('Contact message status updated.');
     } catch (err) {
       setError(getApiErrorMessage(err, 'Unable to update message status.'));
@@ -78,6 +108,7 @@ export default function ContactMessages() {
       await deleteContactMessage(currentMessage._id);
       setMessages((currentMessages) => currentMessages.filter((message) => message._id !== currentMessage._id));
       setSelectedMessage(null);
+      notifyAdminNotificationsChanged();
       setSuccess('Contact message deleted.');
     } catch (err) {
       setError(getApiErrorMessage(err, 'Unable to delete this message.'));

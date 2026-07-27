@@ -49,7 +49,12 @@ export default function AdminLayout() {
     if (isDeliveryStaff) return undefined;
 
     const intervalId = setInterval(loadNotifications, 30000);
-    return () => clearInterval(intervalId);
+    window.addEventListener('admin-notifications-changed', loadNotifications);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('admin-notifications-changed', loadNotifications);
+    };
   }, [isDeliveryStaff, loadNotifications]);
 
   const leaveAdmin = async () => {

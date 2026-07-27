@@ -1,5 +1,9 @@
 const ContactMessage = require('../models/contactMessage');
-const { createContactAdminNotification } = require('./adminNotificationController');
+const {
+  createContactAdminNotification,
+  deleteContactAdminNotifications,
+  markContactAdminNotificationRead,
+} = require('./adminNotificationController');
 const { sendAdminContactEmail } = require('../services/mailService');
 
 const sendContactEmailsInBackground = async (contactMessage) => {
@@ -60,6 +64,8 @@ exports.getContactMessage = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Contact message not found.' });
     }
 
+    await markContactAdminNotificationRead(message._id, message.status !== 'Unread');
+
     return res.status(200).json({ success: true, message });
   } catch (err) {
     if (err.name === 'CastError') {
@@ -101,6 +107,8 @@ exports.deleteContactMessage = async (req, res) => {
     if (!message) {
       return res.status(404).json({ success: false, message: 'Contact message not found.' });
     }
+
+    await deleteContactAdminNotifications(message._id);
 
     return res.status(200).json({ success: true, message: 'Contact message deleted.' });
   } catch (err) {
