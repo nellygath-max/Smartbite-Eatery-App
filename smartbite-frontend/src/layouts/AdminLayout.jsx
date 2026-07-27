@@ -22,6 +22,7 @@ export default function AdminLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const isDeliveryStaff = user?.role === 'delivery_staff';
   const navigation = isDeliveryStaff
     ? [{ label: 'Orders', to: '/delivery/orders' }]
@@ -35,13 +36,17 @@ export default function AdminLayout() {
         { label: 'Reviews', to: '/admin/reviews' },
       ];
 
-  const unreadCount = notifications.filter((notification) => !notification.read).length;
-
   const loadNotifications = useCallback(() => {
     if (isDeliveryStaff) return;
     getAdminNotifications()
-      .then(({ data }) => setNotifications(data?.notifications || []))
-      .catch(() => setNotifications([]));
+      .then(({ data }) => {
+        setNotifications(data?.notifications || []);
+        setUnreadCount(data?.unreadCount || 0);
+      })
+      .catch(() => {
+        setNotifications([]);
+        setUnreadCount(0);
+      });
   }, [isDeliveryStaff]);
 
   useEffect(() => {
@@ -76,6 +81,7 @@ export default function AdminLayout() {
             ? { ...item, read: true, readAt: new Date().toISOString() }
             : item
         )));
+        setUnreadCount((currentCount) => Math.max(currentCount - 1, 0));
       } catch {
         /* The contact message can still be opened if marking read fails. */
       }

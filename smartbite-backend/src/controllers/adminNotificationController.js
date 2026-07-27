@@ -1,4 +1,19 @@
 const AdminNotification = require('../models/adminNotification');
+const ContactMessage = require('../models/contactMessage');
+
+const removeOrphanedContactNotifications = async () => {
+  const contactNotifications = await AdminNotification.find({ type: 'contact_message' }).select('resourceId');
+  const contactMessageIds = contactNotifications.map((notification) => notification.resourceId);
+  const existingContactMessageIds = await ContactMessage.find({ _id: { $in: contactMessageIds } }).distinct('_id');
+  const existingContactMessageIdSet = new Set(existingContactMessageIds.map((id) => id.toString()));
+  const orphanedContactNotificationIds = contactNotifications
+    .filter((notification) => !existingContactMessageIdSet.has(notification.resourceId.toString()))
+    .map((notification) => notification._id);
+
+  if (orphanedContactNotificationIds.length > 0) {
+    await AdminNotification.deleteMany({ _id: { $in: orphanedContactNotificationIds } });
+  }
+};
 
 exports.createContactAdminNotification = (contactMessage) => (
   AdminNotification.create({
@@ -33,13 +48,17 @@ exports.markContactAdminNotificationRead = (contactMessageId, read = true) => (
 
 exports.getAdminNotifications = async (req, res) => {
   try {
+    await removeOrphanedContactNotifications();
+
     const notifications = await AdminNotification.find()
       .sort({ createdAt: -1, _id: -1 })
       .limit(50);
+    const unreadCount = await AdminNotification.countDocuments({ read: false });
+
     return res.status(200).json({
       success: true,
       notifications,
-      unreadCount: notifications.filter((notification) => !notification.read).length,
+      unreadCount,
     });
   } catch (err) {
     console.error('Get admin notifications error:', err);
