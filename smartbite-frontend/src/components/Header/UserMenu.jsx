@@ -23,6 +23,9 @@ export default function UserMenu({ user, onLogout }) {
       <Link className="header__greeting" to="/profile">
         Hi, {user.name?.split(' ')[0]}
       </Link>
+      <Link className="header__greeting" to="/support/messages">
+        Support
+      </Link>
       <button className="header__logout" onClick={onLogout} type="button">
         Log out
       </button>
