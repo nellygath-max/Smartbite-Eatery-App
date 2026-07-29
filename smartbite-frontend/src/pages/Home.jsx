@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import Greeting from '../components/Greeting';
 import HeroBanner from '../components/HeroBanner';
 import MealCard from '../components/MealCard';
 import PendingReviewPanel from '../components/PendingReviewPanel';
@@ -7,6 +8,7 @@ import riceImage from '../assets/rice.jpg';
 import friedRiceImage from '../assets/Fried rice.jpg';
 import hamburgerImage from '../assets/hamburger.jpg';
 import gardenFreshBowlImage from '../assets/garden fresh bowl.jpg';
+import { useAuth } from '../hooks/useAuth';
 import { getMenuItems } from '../services/menuService';
 import { extract } from './pageHelpers';
 
@@ -29,6 +31,7 @@ const featuredMeals = [
 ];
 
 export default function Home() {
+  const { user } = useAuth();
   const [meals, setMeals] = useState([]);
   const location = useLocation();
 
@@ -55,6 +58,7 @@ export default function Home() {
   return (
     <>
       <HeroBanner />
+      {user && <Greeting userName={user.name} />}
       <PendingReviewPanel />
       <section className="page-shell py-14 md:py-20">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
