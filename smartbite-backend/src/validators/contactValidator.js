@@ -38,13 +38,26 @@ const contactMessageIdValidation = [
 const updateContactStatusValidation = [
   param('id').isMongoId().withMessage('Provide a valid contact message id.'),
   body('status')
-    .isIn(['Unread', 'Read', 'Resolved'])
-    .withMessage('Status must be Unread, Read, or Resolved.'),
+    .isIn(['Pending', 'Replied', 'Unread', 'Read', 'Resolved'])
+    .withMessage('Status must be Pending or Replied.'),
+  handleValidationErrors,
+];
+
+const replyContactMessageValidation = [
+  param('id').isMongoId().withMessage('Provide a valid contact message id.'),
+  body('reply')
+    .isString()
+    .trim()
+    .notEmpty()
+    .withMessage('Reply is required.')
+    .isLength({ max: 2000 })
+    .withMessage('Reply cannot exceed 2000 characters.'),
   handleValidationErrors,
 ];
 
 module.exports = {
   createContactMessageValidation,
   contactMessageIdValidation,
+  replyContactMessageValidation,
   updateContactStatusValidation,
 };

@@ -69,4 +69,12 @@ const authorize = (...roles) => (req, res, next) => {
   return next();
 };
 
-module.exports = { authenticate, authorize };
+const optionalAuthenticate = async (req, res, next) => {
+  const authorization = req.get('Authorization');
+
+  if (!authorization) return next();
+
+  return authenticate(req, res, next);
+};
+
+module.exports = { authenticate, authorize, optionalAuthenticate };

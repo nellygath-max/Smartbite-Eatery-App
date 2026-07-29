@@ -26,10 +26,26 @@ const contactMessageSchema = new mongoose.Schema(
       trim: true,
       maxlength: [2000, 'Message cannot exceed 2000 characters'],
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    reply: {
+      type: String,
+      trim: true,
+      maxlength: [2000, 'Reply cannot exceed 2000 characters'],
+    },
+    repliedAt: {
+      type: Date,
+    },
+    repliedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
     status: {
       type: String,
-      enum: ['Unread', 'Read', 'Resolved'],
-      default: 'Unread',
+      enum: ['Pending', 'Replied', 'Unread', 'Read', 'Resolved'],
+      default: 'Pending',
     },
   },
   {
