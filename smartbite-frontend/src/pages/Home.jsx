@@ -60,7 +60,7 @@ export default function Home() {
       <HeroBanner />
       {user && <Greeting userName={user.name} />}
       <PendingReviewPanel />
-      <section className="page-shell py-14 md:py-20">
+      <section className="page-shell pb-14 pt-8 md:pb-20 md:pt-10">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="section-kicker">The favourites</p>

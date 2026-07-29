@@ -32,7 +32,7 @@ export default function PendingReviewPanel() {
 
   return (
     <>
-      <section className="page-shell pb-6">
+      <section className="page-shell pb-0">
         <div className="rounded-3xl border border-brand-border bg-brand-primary-soft p-5 shadow-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>

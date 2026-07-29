@@ -32,7 +32,7 @@ export default function Greeting({ userName }) {
           <h2 className="text-2xl font-black text-brand-text">
             {greeting.title}
           </h2>
-          <p className="mt-1 text-brand-muted">{greeting.message}</p>
+          <p className="mt-1 text-brand-body">{greeting.message}</p>
         </div>
       </div>
     </section>
