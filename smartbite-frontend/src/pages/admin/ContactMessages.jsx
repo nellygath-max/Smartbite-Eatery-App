@@ -157,7 +157,7 @@ export default function ContactMessages() {
         <TableSkeleton />
       ) : (
         <>
-          <div className="mt-7 grid gap-3 rounded-2xl border border-brand-border bg-brand-surface p-4 shadow-sm md:grid-cols-[1fr_auto]">
+          <div className="mt-7 grid items-end gap-3 rounded-2xl border border-brand-border bg-brand-surface p-4 shadow-sm md:grid-cols-[minmax(0,48rem)_11rem]">
             <label className="block text-sm font-bold text-brand-text">
               Search messages
               <input
@@ -173,7 +173,7 @@ export default function ContactMessages() {
               <select
                 value={statusFilter}
                 onChange={(event) => setStatusFilter(event.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-brand-border bg-brand-surface px-4 py-3 outline-none transition focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15 md:w-44"
+                className="mt-1.5 w-full rounded-xl border border-brand-border bg-brand-surface px-4 py-3 outline-none transition focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/15"
               >
                 <option>All</option>
                 <option>Pending</option>

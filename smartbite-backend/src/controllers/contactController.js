@@ -79,7 +79,7 @@ exports.getContactMessage = async (req, res) => {
     }
 
     normalizeContactStatus(message);
-    await markContactAdminNotificationRead(message._id, message.status !== 'Pending');
+    await markContactAdminNotificationRead(message._id);
 
     return res.status(200).json({ success: true, message });
   } catch (err) {
