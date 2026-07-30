@@ -158,7 +158,9 @@ Import the [Postman collection](https://web.postman.co/workspace/Chinelo-Onwuegb
 `POST /api/auth/login` - Authenticate a user and return a JWT.
 `POST /api/auth/logout` - Log out the authenticated user. 
 `GET /api/auth/profile` - Retrieve the authenticated user's profile information.
-`GET /api/auth/admin/users` **Admin** - Retrieve all registered users. Admin only.
+`POST /api/contact`- Submit a contact message to SmartBite support.
+`GET /api/contact/mine` - Retrieve all contact messages submitted by the authenticated user.
+
 
 | User profile | 
 | Method | Endpoint | Description |
@@ -178,9 +180,7 @@ Import the [Postman collection](https://web.postman.co/workspace/Chinelo-Onwuegb
 | Method | Endpoint | Description |
 `GET /api/menu-categories` - Retrieve all menu categories.
 `GET /api/menu-categories/:id` - Retrieve a specific menu category by ID.
-`POST /api/menu-categories` **Admin** - Create a new menu category. Admin only.
-`PATCH /api/menu-categories/:id` **Admin** - Update an existing menu category. Admin only.
-`DELETE /api/menu-categories/:id` **Admin** - Delete a menu category. Admin only.
+
 
 | Orders | 
 | Method | Endpoint | Description |
@@ -192,22 +192,41 @@ Import the [Postman collection](https://web.postman.co/workspace/Chinelo-Onwuegb
 
 | Reviews |
 | Method | Endpoint | Description | 
-`POST /api/reviews` - Create a new review for a menu item. 
-`GET /api/reviews` - Retrieve all reviews.
-`GET /api/reviews/menu/:menuItemId` - Retrieve all reviews for a specific menu item.
+`POST /api/reviews` - Create a new review for a menu item by authenticated users 
+`GET /api/reviews/menu/:menuItemId` - Retrieve all reviews for a specific menu item by public
+`GET /api/reviews` - Retrieve all reviews by authenticated users or Public.
 `GET /api/reviews/my-reviews` -  Retrieve all reviews submitted by the authenticated user. 
-`PATCH /api/reviews/:id` - Update an existing review.
+`PATCH /api/reviews/:id` - Update an existing review by the user or admin.
 
 | Administration | 
 | Method | Endpoint | Description |
 `GET /api/admin/dashboard` - Retrieve dashboard statistics.
+
+## Users
 `GET /api/admin/users` - Retrieve all registered users
 `POST /api/admin/users` - Create a new user or administrator account.
 `PATCH /api/admin/users/:id/role` - Update a user's role, An Admin may assign the user to be a delivery staff.
+`GET /api/auth/admin/users` - Retrieve all registered users. Admin only.
+
+## Orders
 `GET /api/admin/orders` - Retrieve all customer orders.
 `PATCH /api/admin/orders/:id/status` - Update the status of an order 
 `PATCH /api/admin/orders/:id/payment-status` - Update the payment status of an order 
 `DELETE /api/admin/orders/:id` - Delete an order.
+
+## Menu categories
+`POST /api/menu-categories` - Create a new menu category. Admin only.
+`PATCH /api/menu-categories/:id` - Update an existing menu category. Admin only.
+`DELETE /api/menu-categories/:id` - Delete a menu category. Admin only.
+
+## Contact Messages
+Method	Endpoint	Description
+`GET	/api/contact`- Retrieve all contact messages.
+`GET	/api/contact/:id`- Retrieve a specific contact message.
+`PATCH	/api/contact/:id/status`- Update the status of a contact message.
+`PATCH	/api/contact/:id/reply`	- Reply to a contact message.
+`DELETE	/api/contact/:id`- Delete a contact message.
+
 
 
 ## Screenshots
