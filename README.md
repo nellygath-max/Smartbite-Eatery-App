@@ -154,58 +154,61 @@ Import the [Postman collection](https://web.postman.co/workspace/Chinelo-Onwuegb
 
 | Authentication |
 | Method | Endpoint | Description |
-`POST /api/auth/signup`, 
-`POST /api/auth/login`, 
-`POST /api/auth/logout`, 
-`GET /api/auth/profile`, 
-`GET /api/auth/admin/users` **Admin** |
+`POST /api/auth/signup` - Register a new user.
+`POST /api/auth/login` - Authenticate a user and return a JWT.
+`POST /api/auth/logout` - Log out the authenticated user. 
+`GET /api/auth/profile` - Retrieve the authenticated user's profile information.
+`GET /api/auth/admin/users` **Admin** - Retrieve all registered users. Admin only.
 
 | User profile | 
 | Method | Endpoint | Description |
-`GET /api/users/profile`, 
-`PUT /api/users/profile` |
+`GET /api/users/profile` - Retrieve the authenticated user's profile information.
+`PUT /api/users/profile` - Update the authenticated user's profile information.
 
 | Menu items | 
 | Method | Endpoint | Description |
-`GET /api/menu`, 
-`GET /api/menu/:id`, 
-`POST /api/menu` **Admin**, 
-`PUT /api/menu/:id` **Admin**, 
-`PATCH /api/menu/:id/image` **Admin**, 
-`DELETE /api/menu/:id` **Admin** |
+`GET /api/menu` - Retrieve all menu items.
+`GET /api/menu/:id` - Retrieve a specific menu item. 
+`POST /api/menu` **Admin** - Create a new menu item.
+`PUT /api/menu/:id` **Admin** - Update a menu item.
+`PATCH /api/menu/:id/image` **Admin** - Replace a menu item's image.
+`DELETE /api/menu/:id` **Admin** - Delete a menu item.
 
 | Menu categories | 
 | Method | Endpoint | Description |
-`GET /api/menu-categories`, 
-`GET /api/menu-categories/:id`, 
-`POST /api/menu-categories` **Admin**, 
-`PATCH /api/menu-categories/:id` **Admin**, 
-`DELETE /api/menu-categories/:id` **Admin** |
+`GET /api/menu-categories` - Retrieve all menu categories.
+`GET /api/menu-categories/:id` - Retrieve a specific menu category by ID.
+`POST /api/menu-categories` **Admin** - Create a new menu category. Admin only.
+`PATCH /api/menu-categories/:id` **Admin** - Update an existing menu category. Admin only.
+`DELETE /api/menu-categories/:id` **Admin** - Delete a menu category. Admin only.
 
 | Orders | 
 | Method | Endpoint | Description |
-`POST /api/orders`, 
-`GET /api/orders/my-orders` |
+`POST /api/orders` - Create a new order.
+`GET /api/orders/my-orders` - Retrieve all orders placed by the authenticated user.
+`GET/api/orders/:id` - Retrieve details of a specific order.
+`PATCH/api/orders/:id` - Update an existing order.
+`DELETE/api/orders/:id` - Delete or cancel an order.
 
 | Reviews |
 | Method | Endpoint | Description | 
-`POST /api/reviews`, 
-`GET /api/reviews`, 
-`GET /api/reviews/menu/:menuItemId`, 
-`GET /api/reviews/my-reviews`, 
-`PATCH /api/reviews/:id` |
+`POST /api/reviews` - Create a new review for a menu item. 
+`GET /api/reviews` - Retrieve all reviews.
+`GET /api/reviews/menu/:menuItemId` - Retrieve all reviews for a specific menu item.
+`GET /api/reviews/my-reviews` -  Retrieve all reviews submitted by the authenticated user. 
+`PATCH /api/reviews/:id` - Update an existing review.
 
 | Administration | 
 | Method | Endpoint | Description |
-`GET /api/admin/dashboard`, 
-`GET /api/admin/users`, 
-`POST /api/admin/users`, 
-`PATCH /api/admin/users/:id/role`, 
-`GET /api/admin/orders`, 
-`PATCH /api/admin/orders/:id/status`, 
-`PATCH /api/admin/orders/:id/payment-status`, 
-`DELETE /api/admin/orders/:id` |
-| Sample | `GET /api/sample`, `POST /api/sample` |
+`GET /api/admin/dashboard` - Retrieve dashboard statistics.
+`GET /api/admin/users` - Retrieve all registered users
+`POST /api/admin/users` - Create a new user or administrator account.
+`PATCH /api/admin/users/:id/role` - Update a user's role, An Admin may assign the user to be a delivery staff.
+`GET /api/admin/orders` - Retrieve all customer orders.
+`PATCH /api/admin/orders/:id/status` - Update the status of an order 
+`PATCH /api/admin/orders/:id/payment-status` - Update the payment status of an order 
+`DELETE /api/admin/orders/:id` - Delete an order.
+
 
 ## Screenshots
 Screenshots of key pages (Home, Menu, Cart, Checkout, Myorders, Admin Dashboard, etc.). 
