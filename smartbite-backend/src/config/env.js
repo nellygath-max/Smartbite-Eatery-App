@@ -74,6 +74,7 @@ module.exports = {
   SMTP_SECURE: smtpSecure,
   SMTP_USER: process.env.SMTP_USER || '',
   SMTP_PASS: process.env.SMTP_PASS || '',
+  SMTP_DIAGNOSTICS_KEY: process.env.SMTP_DIAGNOSTICS_KEY || '',
   TRUST_PROXY: process.env.TRUST_PROXY || 'loopback, linklocal, uniquelocal',
   AUTH_RATE_LIMIT_WINDOW_MS: Number.isInteger(authRateLimitWindowMs)
     ? authRateLimitWindowMs

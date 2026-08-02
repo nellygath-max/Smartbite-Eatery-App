@@ -6,6 +6,7 @@ const {
   logout,
   forgotPassword,
   resetPassword,
+  smtpHealth,
 } = require('../controllers/authController');
 const { authenticate, authorize } = require('../middleware/auth');
 const User = require('../models/user');
@@ -21,6 +22,7 @@ router.post('/signup', authRateLimit, signupValidation, signup);
 router.post('/login', authRateLimit, loginValidation, login);
 router.post('/forgot-password', authRateLimit, forgotPasswordValidation, forgotPassword);
 router.post('/reset-password', authRateLimit, resetPasswordValidation, resetPassword);
+router.get('/smtp-health', authRateLimit, smtpHealth);
 router.post('/logout', authenticate, logout);
 
 // GET /api/auth/profile

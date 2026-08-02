@@ -1,8 +1,15 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/user');
-const { JWT_SECRET, JWT_ISSUER, JWT_AUDIENCE, JWT_EXPIRES_IN } = require('../config/env');
 const {
+  JWT_SECRET,
+  JWT_ISSUER,
+  JWT_AUDIENCE,
+  JWT_EXPIRES_IN,
+  SMTP_DIAGNOSTICS_KEY,
+} = require('../config/env');
+const {
+  checkSmtpHealth,
   getMissingMailConfigKeys,
   isMailConfigured,
   sendPasswordResetOtpEmail,
@@ -285,6 +292,40 @@ exports.resetPassword = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Unable to reset password right now. Please try again later.',
+    });
+  }
+};
+
+// GET /api/auth/smtp-health
+exports.smtpHealth = async (req, res) => {
+  try {
+    if (!SMTP_DIAGNOSTICS_KEY) {
+      return res.status(404).json({
+        success: false,
+        message: 'SMTP diagnostics endpoint is disabled.',
+      });
+    }
+
+    const providedKey = req.get('x-diagnostics-key');
+    if (!providedKey || providedKey !== SMTP_DIAGNOSTICS_KEY) {
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid diagnostics key.',
+      });
+    }
+
+    const health = await checkSmtpHealth();
+    const statusCode = health.ok ? 200 : 503;
+    return res.status(statusCode).json({
+      success: health.ok,
+      smtp: health,
+      checkedAt: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error('SMTP health check error:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to run SMTP diagnostics right now.',
     });
   }
 };

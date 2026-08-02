@@ -80,7 +80,28 @@ Expected success output includes:
 node -e "const { getTransporter } = require('./src/services/mailService'); getTransporter().verify().then(()=>console.log('SMTP ok')).catch((e)=>{console.error(e.message); process.exit(1);});"
 ```
 
-3. Verify forgot-password endpoint behavior:
+3. Verify through the protected diagnostics endpoint (recommended for production):
+
+Set `SMTP_DIAGNOSTICS_KEY` in your backend environment, redeploy/restart, then:
+
+```bash
+curl -H "x-diagnostics-key: <your-diagnostics-key>" http://localhost:3000/api/auth/smtp-health
+```
+
+For Render/production:
+
+```bash
+curl -H "x-diagnostics-key: <your-diagnostics-key>" https://smartbite-backend-lgje.onrender.com/api/auth/smtp-health
+```
+
+This returns:
+
+- `200` when SMTP is configured and reachable.
+- `503` when SMTP config is incomplete or SMTP is unreachable.
+- `403` when `x-diagnostics-key` is missing or invalid.
+- `404` when `SMTP_DIAGNOSTICS_KEY` is not set (endpoint disabled).
+
+4. Verify forgot-password endpoint behavior:
 
 ```bash
 curl -X POST http://localhost:3000/api/auth/forgot-password -H "Content-Type: application/json" -d '{"email":"customer@example.com"}'
