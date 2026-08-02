@@ -7,11 +7,11 @@ SmartBite Eatery is a full-stack food-ordering web application for browsing meal
 
 ## S.M.A.R.T. — What it stands for
 Letter	Value	What it means
-S	Sincere	What's on the menu is what's on your plate — no exaggeration, no bait-and-switch.
-M	Made-fresh	Nothing frozen and passed off as fresh, nothing hidden in the kitchen.
-A	Authentic	Real recipes, real ingredients, real flavor — no shortcuts, no imitations.
-R	Reliable	Same quality, same experience, every single visit.
-T	Transparent	Clear pricing, clear sourcing — no surprises on your plate or your bill.
+S	Sincere: What's on the menu is what's on your plate — no exaggeration, no bait-and-switch.
+M	Made-fresh: Nothing frozen and passed off as fresh, nothing hidden in the kitchen.
+A	Authentic: Real recipes, real ingredients, real flavor — no shortcuts, no imitations.
+R	Reliable: Same quality, same experience, every single visit.
+T	Transparent: Clear pricing, clear sourcing — no surprises on your plate or your bill.
 
 ## Why S.M.A.R.T Bite?
 

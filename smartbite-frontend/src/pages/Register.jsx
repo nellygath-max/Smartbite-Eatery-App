@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { signIn, signUp } from '../services/authService';
 import { getApiErrorMessage } from '../utils/apiError';
@@ -8,7 +8,9 @@ import { Field, Message } from './shared';
 
 export default function Register({ login = false }) {
   const { authenticate } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
+  const from = location.state?.from?.pathname;
   const [error, setError] = useState('');
   const submit = async (e) => {
     e.preventDefault();
@@ -21,7 +23,13 @@ export default function Register({ login = false }) {
     try {
       const { data } = await (login ? signIn(form) : signUp(form));
       authenticate(data);
-      navigate(data?.user?.role === 'admin' ? '/admin' : '/');
+      if (login) {
+        const destination =
+          data?.user?.role === 'admin' ? '/admin' : from || '/';
+        navigate(destination, { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
     } catch (err) {
       setError(
         getApiErrorMessage(

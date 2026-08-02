@@ -4,6 +4,8 @@ export default function ProtectedRoute({ adminOnly = false, allowedRoles = [] })
   const { user, loading } = useAuth();
   const location = useLocation();
   if (loading)
+
+    
     return (
       <div className="grid min-h-screen place-items-center font-bold text-brand-secondary">
         Loading your table…
