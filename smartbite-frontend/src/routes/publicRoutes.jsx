@@ -6,6 +6,7 @@ import MealDetails from '../pages/MealDetails';
 import Cart from '../pages/Cart';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
+import ForgotPassword from '../pages/ForgotPassword';
 
 export const publicRoutes = [
   { path: '/', element: <Home /> },
@@ -16,4 +17,5 @@ export const publicRoutes = [
   { path: '/cart', element: <Cart /> },
   { path: '/login', element: <Login /> },
   { path: '/register', element: <Register /> },
+  { path: '/forgot-password', element: <ForgotPassword /> },
 ];

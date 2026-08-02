@@ -1,6 +1,16 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const User = require('../models/user');
 const { JWT_SECRET, JWT_ISSUER, JWT_AUDIENCE, JWT_EXPIRES_IN } = require('../config/env');
+const { isMailConfigured, sendPasswordResetOtpEmail } = require('../services/mailService');
+
+const PASSWORD_RESET_OTP_TTL_MINUTES = 10;
+const MAX_PASSWORD_RESET_ATTEMPTS = 5;
+
+const hashOtp = (otp) => crypto
+  .createHash('sha256')
+  .update(`${otp}:${JWT_SECRET}`)
+  .digest('hex');
 
 // Helper: sign a JWT for a given user id
 const signToken = (user) => {
@@ -155,5 +165,121 @@ exports.logout = async (req, res) => {
   } catch (err) {
     console.error('Logout error:', err);
     return res.status(500).json({ success: false, message: 'Server error during logout.' });
+  }
+};
+
+// POST /api/auth/forgot-password
+exports.forgotPassword = async (req, res) => {
+  try {
+    if (!isMailConfigured()) {
+      return res.status(503).json({
+        success: false,
+        message: 'Password reset email is not configured on the server.',
+      });
+    }
+
+    const { email } = req.body;
+    const normalizedEmail = String(email || '').toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail })
+      .select('+passwordResetOtpHash +passwordResetOtpExpiresAt +passwordResetOtpAttempts');
+
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        message: 'If an account exists for this email, an OTP has been sent.',
+      });
+    }
+
+    const otp = String(crypto.randomInt(100000, 1000000));
+    const expiresAt = new Date(Date.now() + PASSWORD_RESET_OTP_TTL_MINUTES * 60 * 1000);
+
+    user.passwordResetOtpHash = hashOtp(otp);
+    user.passwordResetOtpExpiresAt = expiresAt;
+    user.passwordResetOtpAttempts = 0;
+    await user.save({ validateBeforeSave: false });
+
+    await sendPasswordResetOtpEmail({
+      email: user.email,
+      name: user.name,
+      otp,
+      expiresInMinutes: PASSWORD_RESET_OTP_TTL_MINUTES,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'If an account exists for this email, an OTP has been sent.',
+    });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to send reset OTP right now. Please try again later.',
+    });
+  }
+};
+
+// POST /api/auth/reset-password
+exports.resetPassword = async (req, res) => {
+  try {
+    const { email, otp, password } = req.body;
+    const normalizedEmail = String(email || '').toLowerCase();
+
+    const user = await User.findOne({ email: normalizedEmail })
+      .select('+password +tokenVersion +passwordResetOtpHash +passwordResetOtpExpiresAt +passwordResetOtpAttempts');
+
+    if (!user || !user.passwordResetOtpHash || !user.passwordResetOtpExpiresAt) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired OTP.' });
+    }
+
+    if (user.passwordResetOtpExpiresAt.getTime() < Date.now()) {
+      user.passwordResetOtpHash = undefined;
+      user.passwordResetOtpExpiresAt = undefined;
+      user.passwordResetOtpAttempts = 0;
+      await user.save({ validateBeforeSave: false });
+      return res.status(400).json({ success: false, message: 'Invalid or expired OTP.' });
+    }
+
+    if ((user.passwordResetOtpAttempts || 0) >= MAX_PASSWORD_RESET_ATTEMPTS) {
+      return res.status(429).json({
+        success: false,
+        message: 'Too many incorrect OTP attempts. Please request a new code.',
+      });
+    }
+
+    const otpHash = hashOtp(String(otp));
+    if (otpHash !== user.passwordResetOtpHash) {
+      user.passwordResetOtpAttempts = (user.passwordResetOtpAttempts || 0) + 1;
+
+      if (user.passwordResetOtpAttempts >= MAX_PASSWORD_RESET_ATTEMPTS) {
+        user.passwordResetOtpHash = undefined;
+        user.passwordResetOtpExpiresAt = undefined;
+        user.passwordResetOtpAttempts = 0;
+      }
+
+      await user.save({ validateBeforeSave: false });
+      return res.status(400).json({ success: false, message: 'Invalid or expired OTP.' });
+    }
+
+    user.password = password;
+    user.passwordResetOtpHash = undefined;
+    user.passwordResetOtpExpiresAt = undefined;
+    user.passwordResetOtpAttempts = 0;
+    user.tokenVersion = (user.tokenVersion || 0) + 1;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password reset successful. Please sign in with your new password.',
+    });
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+
+    console.error('Reset password error:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to reset password right now. Please try again later.',
+    });
   }
 };

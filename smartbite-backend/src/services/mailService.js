@@ -57,6 +57,14 @@ const getTransporter = () => {
   return transporter;
 };
 
+const isMailConfigured = () => Boolean(
+  SMTP_HOST
+  && SMTP_PORT
+  && SMTP_USER
+  && SMTP_PASS
+  && (SMTP_FROM || ADMIN_EMAIL)
+);
+
 const formatDateTime = (date) => new Intl.DateTimeFormat('en-NG', {
   dateStyle: 'full',
   timeStyle: 'medium',
@@ -120,9 +128,30 @@ const sendContactEmails = async (contactMessage) => {
   };
 };
 
+const sendPasswordResetOtpEmail = async ({ email, name, otp, expiresInMinutes }) => (
+  getTransporter().sendMail({
+    from: SMTP_FROM || ADMIN_EMAIL,
+    to: email,
+    subject: 'Your SmartBite password reset code',
+    text: [
+      `Hello ${name || 'there'},`,
+      '',
+      'We received a request to reset your SmartBite password.',
+      `Use this one-time code to continue: ${otp}`,
+      `This code expires in ${expiresInMinutes} minutes.`,
+      '',
+      'If you did not request this, you can ignore this email.',
+      '',
+      'SmartBite Eatery',
+    ].join('\n'),
+  })
+);
+
 module.exports = {
   getTransporter,
+  isMailConfigured,
   sendAdminContactEmail,
   sendContactEmails,
   sendCustomerContactConfirmation,
+  sendPasswordResetOtpEmail,
 };

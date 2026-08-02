@@ -74,6 +74,16 @@ export default function Register({ login = false }) {
             required
           />
         </div>
+        {login && (
+          <p className="mt-3 text-right text-sm">
+            <Link
+              className="font-bold text-brand-link hover:underline"
+              to="/forgot-password"
+            >
+              Forgot password?
+            </Link>
+          </p>
+        )}
         <button className="mt-6 w-full rounded-xl bg-brand-primary py-3.5 font-black text-white transition hover:bg-brand-primary-dark">
           {login ? 'Sign in' : 'Create account'}
         </button>

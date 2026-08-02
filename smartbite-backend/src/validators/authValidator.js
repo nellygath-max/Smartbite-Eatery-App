@@ -16,4 +16,24 @@ const loginValidation = [
   handleValidationErrors,
 ];
 
-module.exports = { signupValidation, loginValidation };
+const forgotPasswordValidation = [
+  body('email').trim().isEmail().withMessage('Provide a valid email address.').normalizeEmail(),
+  handleValidationErrors,
+];
+
+const resetPasswordValidation = [
+  body('email').trim().isEmail().withMessage('Provide a valid email address.').normalizeEmail(),
+  body('otp')
+    .trim()
+    .matches(/^\d{6}$/)
+    .withMessage('OTP must be a 6-digit code.'),
+  body('password').isString().isLength({ min: 8 }).withMessage('Password must be at least 8 characters long.'),
+  handleValidationErrors,
+];
+
+module.exports = {
+  signupValidation,
+  loginValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation,
+};

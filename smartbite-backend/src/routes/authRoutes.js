@@ -1,13 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const { signup, login, logout } = require('../controllers/authController');
+const {
+  signup,
+  login,
+  logout,
+  forgotPassword,
+  resetPassword,
+} = require('../controllers/authController');
 const { authenticate, authorize } = require('../middleware/auth');
 const User = require('../models/user');
-const { signupValidation, loginValidation } = require('../validators/authValidator');
+const {
+  signupValidation,
+  loginValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation,
+} = require('../validators/authValidator');
 const { authRateLimit } = require('../middleware/authRateLimit');
 
 router.post('/signup', authRateLimit, signupValidation, signup);
 router.post('/login', authRateLimit, loginValidation, login);
+router.post('/forgot-password', authRateLimit, forgotPasswordValidation, forgotPassword);
+router.post('/reset-password', authRateLimit, resetPasswordValidation, resetPassword);
 router.post('/logout', authenticate, logout);
 
 // GET /api/auth/profile
