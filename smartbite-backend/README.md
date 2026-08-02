@@ -57,11 +57,37 @@ Notes:
 - If SMTP credentials are missing or invalid, forgot-password requests cannot
 	deliver OTP email. The API now returns `503` with a clear configuration
 	message when SMTP is not configured.
-- To verify SMTP from the backend folder, run:
+
+### Verify SMTP setup directly
+
+Run these checks from the backend folder after loading your `.env`:
+
+1. Verify SMTP config + connectivity using the health helper:
+
+```bash
+node -e "const { checkSmtpHealth } = require('./src/services/mailService'); checkSmtpHealth().then((r)=>{ console.log(JSON.stringify(r, null, 2)); process.exit(r.ok ? 0 : 1); });"
+```
+
+Expected success output includes:
+
+- `"ok": true`
+- `"configured": true`
+- `"message": "SMTP is configured and reachable."`
+
+2. Verify Nodemailer transport directly (low-level check):
 
 ```bash
 node -e "const { getTransporter } = require('./src/services/mailService'); getTransporter().verify().then(()=>console.log('SMTP ok')).catch((e)=>{console.error(e.message); process.exit(1);});"
 ```
+
+3. Verify forgot-password endpoint behavior:
+
+```bash
+curl -X POST http://localhost:3000/api/auth/forgot-password -H "Content-Type: application/json" -d '{"email":"customer@example.com"}'
+```
+
+If SMTP is not configured, this endpoint returns HTTP `503` with a message that
+lists missing SMTP keys.
 
 ## Menu image uploads
 

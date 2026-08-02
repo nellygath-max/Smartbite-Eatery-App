@@ -2,7 +2,11 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/user');
 const { JWT_SECRET, JWT_ISSUER, JWT_AUDIENCE, JWT_EXPIRES_IN } = require('../config/env');
-const { isMailConfigured, sendPasswordResetOtpEmail } = require('../services/mailService');
+const {
+  getMissingMailConfigKeys,
+  isMailConfigured,
+  sendPasswordResetOtpEmail,
+} = require('../services/mailService');
 
 const PASSWORD_RESET_OTP_TTL_MINUTES = 10;
 const MAX_PASSWORD_RESET_ATTEMPTS = 5;
@@ -172,9 +176,10 @@ exports.logout = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   try {
     if (!isMailConfigured()) {
+      const missingKeys = getMissingMailConfigKeys();
       return res.status(503).json({
         success: false,
-        message: 'Password reset email is not configured on the server.',
+        message: `Password reset email is not configured on the server. Missing: ${missingKeys.join(', ') || 'SMTP settings'}.`,
       });
     }
 

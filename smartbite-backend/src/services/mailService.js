@@ -57,13 +57,51 @@ const getTransporter = () => {
   return transporter;
 };
 
-const isMailConfigured = () => Boolean(
-  SMTP_HOST
-  && SMTP_PORT
-  && SMTP_USER
-  && SMTP_PASS
-  && (SMTP_FROM || ADMIN_EMAIL)
-);
+const getMissingMailConfigKeys = () => {
+  const required = {
+    SMTP_HOST,
+    SMTP_PORT,
+    SMTP_USER,
+    SMTP_PASS,
+    SENDER_ADDRESS: SMTP_FROM || ADMIN_EMAIL,
+  };
+
+  return Object.entries(required)
+    .filter(([, value]) => !value)
+    .map(([key]) => key);
+};
+
+const isMailConfigured = () => getMissingMailConfigKeys().length === 0;
+
+const checkSmtpHealth = async () => {
+  const missingKeys = getMissingMailConfigKeys();
+  if (missingKeys.length > 0) {
+    return {
+      ok: false,
+      configured: false,
+      missingKeys,
+      message: 'SMTP configuration is incomplete.',
+    };
+  }
+
+  try {
+    await getTransporter().verify();
+    return {
+      ok: true,
+      configured: true,
+      missingKeys: [],
+      message: 'SMTP is configured and reachable.',
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      configured: true,
+      missingKeys: [],
+      message: 'SMTP is configured but not reachable.',
+      error: error?.message || 'Unknown SMTP verification error.',
+    };
+  }
+};
 
 const formatDateTime = (date) => new Intl.DateTimeFormat('en-NG', {
   dateStyle: 'full',
@@ -148,7 +186,9 @@ const sendPasswordResetOtpEmail = async ({ email, name, otp, expiresInMinutes })
 );
 
 module.exports = {
+  checkSmtpHealth,
   getTransporter,
+  getMissingMailConfigKeys,
   isMailConfigured,
   sendAdminContactEmail,
   sendContactEmails,
